@@ -1,0 +1,78 @@
+using System.Collections.Generic;
+using Godot;
+using ProjetoPlanetario.Narrativa.Diretor;
+using ProjetoPlanetario.Nucleo.Configuracao;
+using ProjetoPlanetario.Nucleo.Estado;
+using ProjetoPlanetario.Nucleo.Eventos;
+
+namespace ProjetoPlanetario.Apresentacao.HUD;
+
+public partial class HUDDeDebug : CanvasLayer
+{
+    private readonly Queue<string> _eventosRecentes = new();
+    private Label? _texto;
+    private EstadoDaNave? _estadoDaNave;
+    private ConfiguracaoDeExecucao? _configuracaoDeExecucao;
+    private DiretorNarrativo? _diretorNarrativo;
+
+    public void Configurar(
+        EstadoDaNave estadoDaNave,
+        ConfiguracaoDeExecucao configuracaoDeExecucao,
+        DiretorNarrativo diretorNarrativo,
+        BarramentoDeEventos barramentoDeEventos)
+    {
+        _estadoDaNave = estadoDaNave;
+        _configuracaoDeExecucao = configuracaoDeExecucao;
+        _diretorNarrativo = diretorNarrativo;
+        barramentoDeEventos.EventoPublicado += RegistrarEvento;
+    }
+
+    public override void _Ready()
+    {
+        _texto = new Label
+        {
+            Position = new Vector2(24, 20),
+            Size = new Vector2(620, 260),
+            AutowrapMode = TextServer.AutowrapMode.WordSmart
+        };
+
+        AddChild(_texto);
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_texto is null || _estadoDaNave is null || _configuracaoDeExecucao is null || _diretorNarrativo is null)
+        {
+            return;
+        }
+
+        _texto.Text =
+            $"Perfil: {_configuracaoDeExecucao.Perfil}\n" +
+            $"Energia: {_estadoDaNave.Energia:0}\n" +
+            $"Integridade: {_estadoDaNave.Integridade:0}\n" +
+            $"Narrativa: {_diretorNarrativo.UltimaLinha}\n\n" +
+            "Eventos recentes:\n" +
+            string.Join("\n", _eventosRecentes);
+    }
+
+    private void RegistrarEvento(EventoDeDominio eventoDeDominio)
+    {
+        var linha = eventoDeDominio switch
+        {
+            PerfilDeExecucaoCarregado evento => $"Perfil carregado: {evento.NomeDoPerfil}",
+            MovimentoDoPilotoAlterado evento => $"Movimento piloto: {evento.X:0.00}, {evento.Y:0.00}",
+            AcaoDoPilotoExecutada evento => $"Piloto: {evento.NomeDaAcao}",
+            EnergiaAlterada evento => $"Energia alterada: {evento.EnergiaAtual:0}",
+            EstacaoAcaoExecutada evento => $"{evento.IdentificadorDaEstacao}: {evento.NomeDaAcao}",
+            DialogoSolicitado evento => $"Dialogo {evento.Personagem}",
+            _ => eventoDeDominio.GetType().Name
+        };
+
+        _eventosRecentes.Enqueue(linha);
+
+        while (_eventosRecentes.Count > 7)
+        {
+            _eventosRecentes.Dequeue();
+        }
+    }
+}

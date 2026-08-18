@@ -1,0 +1,23 @@
+; Engine configuration file.
+; Prefer editing through the Godot editor when changing project settings.
+
+config_version=5
+
+[application]
+
+config/name="Jogo Planetario UFBA"
+run/main_scene="res://Apresentacao/Cenas/CenaMicroPrototipo.tscn"
+config/features=PackedStringArray("4.7", "C#")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[dotnet]
+
+project/assembly_name="JogoPlanetarioUFBA"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"

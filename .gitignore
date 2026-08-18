@@ -1,0 +1,20 @@
+# Godot
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# Builds
+bin/
+obj/
+.mono/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS
+Thumbs.db
+Desktop.ini

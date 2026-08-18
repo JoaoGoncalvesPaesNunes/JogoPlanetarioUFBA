@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JogoPlanetarioUFBA", "JogoPlanetarioUFBA.csproj", "{1B583C36-83A0-4AF8-9807-8303AD3C3D58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestesDominio", "Testes\TestesDominio.csproj", "{7D6F858B-7985-4F7D-8F43-22B93001056F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B583C36-83A0-4AF8-9807-8303AD3C3D58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B583C36-83A0-4AF8-9807-8303AD3C3D58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B583C36-83A0-4AF8-9807-8303AD3C3D58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B583C36-83A0-4AF8-9807-8303AD3C3D58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D6F858B-7985-4F7D-8F43-22B93001056F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D6F858B-7985-4F7D-8F43-22B93001056F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D6F858B-7985-4F7D-8F43-22B93001056F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D6F858B-7985-4F7D-8F43-22B93001056F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
