@@ -2,7 +2,7 @@
 
 Fundacao inicial de um jogo imersivo e inclusivo para o Planetario da UFBA, criado em Godot 4 com C#.
 
-O objetivo deste marco nao e entregar o jogo completo. A base atual prova uma arquitetura pequena para desenvolvimento em desktop, com entrada logica desacoplada de hardware, eventos de dominio, estado minimo da nave, porta de projecao e um microprototipo executavel.
+O objetivo destes primeiros marcos nao e entregar o jogo completo. A base atual prova uma arquitetura pequena para desenvolvimento em desktop, com entrada logica desacoplada de hardware, eventos de dominio, estado minimo da nave, porta de projecao e um microprototipo executavel em primeira pessoa.
 
 ## Ambiente validado
 
@@ -24,9 +24,12 @@ Observacao: o executavel Godot encontrado neste ambiente (`E:\Godot\Godot_v4.7.1
 
 ## Controles do microprototipo
 
-- `WASD` ou setas: mover a nave.
-- `Espaco`: executar acao primaria logica e consumir energia.
+- `WASD` ou setas: alinhar o reticulo da nave com o ponto de dobra.
+- `Espaco`: acionar estabilizador de dobra, consumindo energia e aumentando estabilidade.
 - Mouse: clicar nos botoes da estacao virtual.
+- Estacao virtual `ESQ`/`DIR`: selecionar rota demonstrativa Marte/Jupiter.
+- Estacao virtual `ACAO 1`: apoio da tripulacao para aumentar estabilidade.
+- Estacao virtual `ACAO 2`: redistribuir energia com pequena perda de estabilidade.
 
 ## Validacao
 
@@ -42,13 +45,15 @@ O build C# e os testes de dominio foram validados. A validacao headless da cena 
 
 - Perfil funcional `DesktopDev`.
 - Adaptador `AdaptadorTecladoMouse` lendo acoes logicas do Input Map.
-- Nave placeholder controlada por `ControladorDeVoo`.
-- `EstadoDaNave` puro com energia e integridade.
+- Camera de primeira pessoa e cockpit placeholder.
+- Loop central de alinhamento com ponto de dobra.
+- `EstadoDaNave` puro com energia, integridade e estabilidade da dobra.
 - `BarramentoDeEventos` tipado.
 - HUD de debug.
 - Estacao virtual clicavel para simular uma futura estacao arcade.
 - Porta de projecao desktop e stub documentado para planetario.
 - Diretor narrativo minimo para ORION e gatinho como texto.
+- Cenario temporario com estrelas, planeta, asteroides e marcador de dobra.
 
 ## Fora do escopo deste marco
 

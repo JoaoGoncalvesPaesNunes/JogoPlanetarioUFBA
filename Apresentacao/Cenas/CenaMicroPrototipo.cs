@@ -21,6 +21,7 @@ public partial class CenaMicroPrototipo : Node3D
 	private readonly EstadoDaNave _estadoDaNave = new();
 	private readonly ConfiguracaoDeExecucao _configuracaoDeExecucao = ConfiguracaoDeExecucao.CriarDesktopDev();
 	private readonly ConfiguracaoDaNave _configuracaoDaNave = new();
+	private CockpitDoPiloto? _cockpitDoPiloto;
 
 	public override void _Ready()
 	{
@@ -30,28 +31,16 @@ public partial class CenaMicroPrototipo : Node3D
 		var portaDeProjecao = new AdaptadorProjecaoDesktop(new Rect2(Vector2.Zero, GetViewport().GetVisibleRect().Size));
 		portaDeProjecao.AplicarEmViewport(GetViewport());
 
-		CriarCamera();
 		CriarLuz();
 		CriarFundoEspacial();
-		CriarNave();
-		CriarAlvoDeTeste();
+		var controladorDeVoo = CriarNave();
+		CriarCenarioDeRota();
+		CriarCockpit(controladorDeVoo);
 		CriarHud(diretorNarrativo);
 		CriarEstacaoVirtual();
 		_barramentoDeEventos.EventoPublicado += AplicarRespostaDaEstacaoDeTeste;
 
 		_barramentoDeEventos.Publicar(new PerfilDeExecucaoCarregado(_configuracaoDeExecucao.Perfil.ToString(), DateTime.UtcNow));
-	}
-
-	private void CriarCamera()
-	{
-		var camera = new Camera3D
-		{
-			Name = "CameraDesktop",
-			Position = new Vector3(0f, 0f, 18f),
-			Current = true,
-			Fov = 60f
-		};
-		AddChild(camera);
 	}
 
 	private void CriarLuz()
@@ -67,6 +56,20 @@ public partial class CenaMicroPrototipo : Node3D
 
 	private void CriarFundoEspacial()
 	{
+		var ambiente = new WorldEnvironment
+		{
+			Name = "AmbienteEspacial",
+			Environment = new Godot.Environment
+			{
+				BackgroundMode = Godot.Environment.BGMode.Color,
+				BackgroundColor = new Color(0.005f, 0.007f, 0.015f),
+				AmbientLightSource = Godot.Environment.AmbientSource.Color,
+				AmbientLightColor = new Color(0.08f, 0.1f, 0.13f),
+				AmbientLightEnergy = 0.55f
+			}
+		};
+		AddChild(ambiente);
+
 		var material = new StandardMaterial3D
 		{
 			AlbedoColor = new Color(0.8f, 0.95f, 1f)
@@ -83,9 +86,9 @@ public partial class CenaMicroPrototipo : Node3D
 					Height = 0.05f
 				},
 				Position = new Vector3(
-					GD.Randf() * 26f - 13f,
-					GD.Randf() * 14f - 7f,
-					-GD.Randf() * 18f - 4f),
+					GD.Randf() * 44f - 22f,
+					GD.Randf() * 22f - 11f,
+					-GD.Randf() * 30f - 6f),
 				MaterialOverride = material
 			};
 
@@ -93,65 +96,98 @@ public partial class CenaMicroPrototipo : Node3D
 		}
 	}
 
-	private void CriarNave()
+	private ControladorDeVoo CriarNave()
 	{
 		var entradaDoPiloto = new AdaptadorTecladoMouse();
 		var nave = new ControladorDeVoo
 		{
-			Name = "NaveDoPiloto"
+			Name = "CockpitDoPiloto3D"
 		};
 
-		var corpo = new MeshInstance3D
+		var camera = new Camera3D
 		{
-			Name = "CorpoPlaceholder",
-			Mesh = new BoxMesh
-			{
-				Size = new Vector3(1.2f, 0.45f, 1.8f)
-			},
-			MaterialOverride = new StandardMaterial3D
-			{
-				AlbedoColor = new Color(0.2f, 0.75f, 0.9f)
-			}
+			Name = "CameraPrimeiraPessoa",
+			Current = true,
+			Fov = 72f,
+			Near = 0.05f
 		};
 
-		var bico = new MeshInstance3D
-		{
-			Name = "BicoPlaceholder",
-			Position = new Vector3(0f, 0f, -1.15f),
-			Mesh = new PrismMesh
-			{
-				Size = new Vector3(0.9f, 0.5f, 0.9f)
-			},
-			MaterialOverride = new StandardMaterial3D
-			{
-				AlbedoColor = new Color(1f, 0.86f, 0.28f)
-			}
-		};
-
-		nave.AddChild(corpo);
-		nave.AddChild(bico);
+		nave.AddChild(camera);
 		nave.Configurar(entradaDoPiloto, _estadoDaNave, _barramentoDeEventos, _configuracaoDaNave);
 		AddChild(nave);
+		return nave;
 	}
 
-	private void CriarAlvoDeTeste()
+	private void CriarCenarioDeRota()
 	{
-		var alvo = new MeshInstance3D
+		var planeta = new MeshInstance3D
 		{
-			Name = "AlvoDeTeste",
-			Position = new Vector3(4.5f, -1.8f, -6f),
+			Name = "PlanetaPlaceholder",
+			Position = new Vector3(-6.8f, 2.1f, -18f),
 			Mesh = new SphereMesh
 			{
-				Radius = 0.55f,
-				Height = 1.1f
+				Radius = 2.2f,
+				Height = 4.4f
 			},
 			MaterialOverride = new StandardMaterial3D
 			{
-				AlbedoColor = new Color(1f, 0.35f, 0.25f)
+				AlbedoColor = new Color(0.95f, 0.48f, 0.22f),
+				Roughness = 0.8f
 			}
 		};
+		AddChild(planeta);
 
-		AddChild(alvo);
+		var pontoDeDobra = new MeshInstance3D
+		{
+			Name = "PontoDeDobraPlaceholder",
+			Position = new Vector3(2.4f, -0.9f, -9f),
+			Mesh = new TorusMesh
+			{
+				InnerRadius = 0.38f,
+				OuterRadius = 0.46f
+			},
+			MaterialOverride = new StandardMaterial3D
+			{
+				AlbedoColor = new Color(0.1f, 0.95f, 1f),
+				EmissionEnabled = true,
+				Emission = new Color(0.1f, 0.7f, 1f),
+				EmissionEnergyMultiplier = 1.8f
+			}
+		};
+		AddChild(pontoDeDobra);
+
+		var materialAsteroide = new StandardMaterial3D
+		{
+			AlbedoColor = new Color(0.45f, 0.42f, 0.37f),
+			Roughness = 1f
+		};
+
+		for (var indice = 0; indice < 12; indice++)
+		{
+			var asteroide = new MeshInstance3D
+			{
+				Name = $"Asteroide{indice:00}",
+				Position = new Vector3(
+					GD.Randf() * 18f - 9f,
+					GD.Randf() * 7f - 3.5f,
+					-GD.Randf() * 16f - 7f),
+				Rotation = new Vector3(GD.Randf() * 3f, GD.Randf() * 3f, GD.Randf() * 3f),
+				Scale = Vector3.One * (0.18f + GD.Randf() * 0.45f),
+				Mesh = new BoxMesh(),
+				MaterialOverride = materialAsteroide
+			};
+			AddChild(asteroide);
+		}
+	}
+
+	private void CriarCockpit(ControladorDeVoo controladorDeVoo)
+	{
+		_cockpitDoPiloto = new CockpitDoPiloto
+		{
+			Name = "CockpitVisual"
+		};
+		_cockpitDoPiloto.Configurar(controladorDeVoo, _estadoDaNave);
+		AddChild(_cockpitDoPiloto);
 	}
 
 	private void CriarHud(DiretorNarrativo diretorNarrativo)
@@ -182,9 +218,38 @@ public partial class CenaMicroPrototipo : Node3D
 			return;
 		}
 
+		if (evento.NomeDaAcao == AcaoLogicaDaEstacao.Esquerda.ToString())
+		{
+			_cockpitDoPiloto?.DefinirRotaAtual("Marte");
+			_barramentoDeEventos.Publicar(new RotaSelecionada("Marte", DateTime.UtcNow));
+		}
+
+		if (evento.NomeDaAcao == AcaoLogicaDaEstacao.Direita.ToString())
+		{
+			_cockpitDoPiloto?.DefinirRotaAtual("Jupiter");
+			_barramentoDeEventos.Publicar(new RotaSelecionada("Jupiter", DateTime.UtcNow));
+		}
+
 		if (evento.NomeDaAcao == AcaoLogicaDaEstacao.Acao1.ToString() && _estadoDaNave.ConsumirEnergia(2f))
 		{
 			_barramentoDeEventos.Publicar(new EnergiaAlterada(_estadoDaNave.Energia, "EstacaoVirtualAcao1", DateTime.UtcNow));
+			if (_estadoDaNave.AlterarEstabilidadeDaDobra(8f))
+			{
+				_barramentoDeEventos.Publicar(new EstabilidadeDaDobraAlterada(_estadoDaNave.EstabilidadeDaDobra, "TripulacaoAuxiliouDobra", DateTime.UtcNow));
+			}
+		}
+
+		if (evento.NomeDaAcao == AcaoLogicaDaEstacao.Acao2.ToString())
+		{
+			if (_estadoDaNave.RestaurarEnergia(5f))
+			{
+				_barramentoDeEventos.Publicar(new EnergiaAlterada(_estadoDaNave.Energia, "RedistribuicaoDaTripulacao", DateTime.UtcNow));
+			}
+
+			if (_estadoDaNave.AlterarEstabilidadeDaDobra(-3f))
+			{
+				_barramentoDeEventos.Publicar(new EstabilidadeDaDobraAlterada(_estadoDaNave.EstabilidadeDaDobra, "RedistribuicaoDaTripulacao", DateTime.UtcNow));
+			}
 		}
 	}
 }

@@ -11,6 +11,8 @@ public partial class HUDDeDebug : CanvasLayer
 {
     private readonly Queue<string> _eventosRecentes = new();
     private string _ultimaAcao = "Aguardando entrada...";
+    private string _rotaAtual = "Ponto de dobra";
+    private float _alinhamentoDaRota;
     private Label? _texto;
     private EstadoDaNave? _estadoDaNave;
     private ConfiguracaoDeExecucao? _configuracaoDeExecucao;
@@ -52,6 +54,9 @@ public partial class HUDDeDebug : CanvasLayer
             $"Perfil: {_configuracaoDeExecucao.Perfil}\n" +
             $"Energia: {_estadoDaNave.Energia:0}\n" +
             $"Integridade: {_estadoDaNave.Integridade:0}\n" +
+            $"Estabilidade: {_estadoDaNave.EstabilidadeDaDobra:0}\n" +
+            $"Alinhamento: {_alinhamentoDaRota * 100f:0}%\n" +
+            $"Rota: {_rotaAtual}\n" +
             $"Ultima acao: {_ultimaAcao}\n" +
             $"Narrativa: {_diretorNarrativo.UltimaLinha}\n\n" +
             "Eventos recentes:\n" +
@@ -66,10 +71,23 @@ public partial class HUDDeDebug : CanvasLayer
             MovimentoDoPilotoAlterado evento => $"Movimento piloto: {evento.X:0.00}, {evento.Y:0.00}",
             AcaoDoPilotoExecutada evento => $"Piloto: {evento.NomeDaAcao}",
             EnergiaAlterada evento => $"Energia alterada: {evento.EnergiaAtual:0}",
+            EstabilidadeDaDobraAlterada evento => $"Estabilidade: {evento.EstabilidadeAtual:0} ({evento.Motivo})",
+            AlinhamentoDaRotaAlterado evento => $"Alinhamento: {evento.AlinhamentoAtual * 100f:0}%",
+            RotaSelecionada evento => $"Rota selecionada: {evento.NomeDaRota}",
             EstacaoAcaoExecutada evento => $"{evento.IdentificadorDaEstacao}: {evento.NomeDaAcao}",
             DialogoSolicitado evento => $"Dialogo {evento.Personagem}",
             _ => eventoDeDominio.GetType().Name
         };
+
+        if (eventoDeDominio is AlinhamentoDaRotaAlterado alinhamento)
+        {
+            _alinhamentoDaRota = alinhamento.AlinhamentoAtual;
+        }
+
+        if (eventoDeDominio is RotaSelecionada rota)
+        {
+            _rotaAtual = rota.NomeDaRota;
+        }
 
         _ultimaAcao = linha;
         _eventosRecentes.Enqueue(linha);

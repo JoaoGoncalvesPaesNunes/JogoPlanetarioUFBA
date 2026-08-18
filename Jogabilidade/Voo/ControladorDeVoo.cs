@@ -17,6 +17,13 @@ public partial class ControladorDeVoo : Node3D
     private BarramentoDeEventos? _barramentoDeEventos;
     private ConfiguracaoDaNave _configuracaoDaNave = new();
     private Vector2 _ultimoMovimentoPublicado;
+    private float _tempoDeRota;
+    private float _ultimoAlinhamentoPublicado = -1f;
+    private float _ultimoEstabilidadePublicada = -1f;
+
+    public Vector2 ApontamentoDoPiloto { get; private set; }
+    public Vector2 PontoDeDobra { get; private set; }
+    public float AlinhamentoDaRota { get; private set; }
 
     public void Configurar(
         IEntradaDoPiloto entradaDoPiloto,
@@ -39,16 +46,29 @@ public partial class ControladorDeVoo : Node3D
 
         var estadoEntrada = _entradaDoPiloto.LerEstado();
         var movimento = estadoEntrada.Movimento;
+        var deltaFloat = (float)delta;
+
+        _tempoDeRota += deltaFloat;
+        PontoDeDobra = new Vector2(
+            Mathf.Sin(_tempoDeRota * 0.46f) * 0.48f,
+            Mathf.Cos(_tempoDeRota * 0.34f) * 0.32f);
+
+        ApontamentoDoPiloto += new Vector2(movimento.X, movimento.Y) * _configuracaoDaNave.SensibilidadeDeMira * deltaFloat;
+        ApontamentoDoPiloto = LimitarComprimento(ApontamentoDoPiloto, 1f);
+
+        var desvio = PontoDeDobra - ApontamentoDoPiloto;
+        AlinhamentoDaRota = 1f - Mathf.Clamp(desvio.Length() / 1.1f, 0f, 1f);
 
         if (movimento.LengthSquared() > 0.001f)
         {
-            Translate(new Vector3(movimento.X, -movimento.Y, 0f) * _configuracaoDaNave.Velocidade * (float)delta);
-            Rotation = new Vector3(-movimento.Y * 0.15f, movimento.X * 0.15f, -movimento.X * 0.25f);
+            Position = new Vector3(-ApontamentoDoPiloto.X * 0.18f, ApontamentoDoPiloto.Y * 0.12f, 0f);
         }
-        else
-        {
-            Rotation = Rotation.Lerp(Vector3.Zero, _configuracaoDaNave.SuavizacaoRotacao * (float)delta);
-        }
+
+        var rotacaoAlvo = new Vector3(
+            -ApontamentoDoPiloto.Y * 0.08f,
+            -ApontamentoDoPiloto.X * 0.1f,
+            -movimento.X * 0.08f);
+        Rotation = Rotation.Lerp(rotacaoAlvo, _configuracaoDaNave.SuavizacaoRotacao * deltaFloat);
 
         if ((movimento - _ultimoMovimentoPublicado).LengthSquared() > 0.01f)
         {
@@ -56,14 +76,54 @@ public partial class ControladorDeVoo : Node3D
             _barramentoDeEventos.Publicar(new MovimentoDoPilotoAlterado(movimento.X, movimento.Y, DateTime.UtcNow));
         }
 
+        AtualizarEstabilidadeDaDobra(deltaFloat, desvio);
+
         if (estadoEntrada.AcaoPrimariaIniciada)
         {
-            _barramentoDeEventos.Publicar(new AcaoDoPilotoExecutada("AcaoPrimaria", DateTime.UtcNow));
+            _barramentoDeEventos.Publicar(new AcaoDoPilotoExecutada("EstabilizarDobra", DateTime.UtcNow));
 
             if (_estadoDaNave.ConsumirEnergia(_configuracaoDaNave.ConsumoEnergiaAcaoPrimaria))
             {
-                _barramentoDeEventos.Publicar(new EnergiaAlterada(_estadoDaNave.Energia, "AcaoPrimaria", DateTime.UtcNow));
+                _barramentoDeEventos.Publicar(new EnergiaAlterada(_estadoDaNave.Energia, "EstabilizarDobra", DateTime.UtcNow));
+            }
+
+            if (_estadoDaNave.AlterarEstabilidadeDaDobra(14f))
+            {
+                _barramentoDeEventos.Publicar(new EstabilidadeDaDobraAlterada(_estadoDaNave.EstabilidadeDaDobra, "EstabilizarDobra", DateTime.UtcNow));
             }
         }
+    }
+
+    private void AtualizarEstabilidadeDaDobra(float delta, Vector2 desvio)
+    {
+        if (_estadoDaNave is null || _barramentoDeEventos is null)
+        {
+            return;
+        }
+
+        var alinhado = AlinhamentoDaRota >= 0.76f;
+        var variacao = alinhado
+            ? _configuracaoDaNave.GanhoEstabilidadeAlinhado * delta
+            : -_configuracaoDaNave.PerdaEstabilidadeDesalinhado * (1f - AlinhamentoDaRota) * delta;
+
+        if (_estadoDaNave.AlterarEstabilidadeDaDobra(variacao) &&
+            Math.Abs(_estadoDaNave.EstabilidadeDaDobra - _ultimoEstabilidadePublicada) >= 1f)
+        {
+            _ultimoEstabilidadePublicada = _estadoDaNave.EstabilidadeDaDobra;
+            _barramentoDeEventos.Publicar(new EstabilidadeDaDobraAlterada(_estadoDaNave.EstabilidadeDaDobra, alinhado ? "RotaAlinhada" : "RotaInstavel", DateTime.UtcNow));
+        }
+
+        if (Math.Abs(AlinhamentoDaRota - _ultimoAlinhamentoPublicado) >= 0.04f)
+        {
+            _ultimoAlinhamentoPublicado = AlinhamentoDaRota;
+            _barramentoDeEventos.Publicar(new AlinhamentoDaRotaAlterado(AlinhamentoDaRota, desvio.X, desvio.Y, DateTime.UtcNow));
+        }
+    }
+
+    private static Vector2 LimitarComprimento(Vector2 valor, float comprimentoMaximo)
+    {
+        return valor.Length() > comprimentoMaximo
+            ? valor.Normalized() * comprimentoMaximo
+            : valor;
     }
 }

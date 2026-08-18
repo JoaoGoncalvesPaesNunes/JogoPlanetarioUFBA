@@ -12,6 +12,12 @@ public sealed record AcaoDoPilotoExecutada(string NomeDaAcao, DateTime MomentoUt
 
 public sealed record EnergiaAlterada(float EnergiaAtual, string Motivo, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
+public sealed record EstabilidadeDaDobraAlterada(float EstabilidadeAtual, string Motivo, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record AlinhamentoDaRotaAlterado(float AlinhamentoAtual, float DesvioX, float DesvioY, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record RotaSelecionada(string NomeDaRota, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
 public sealed record EstacaoAcaoExecutada(string IdentificadorDaEstacao, string NomeDaAcao, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
 public sealed record DialogoSolicitado(string Personagem, string Texto, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);

@@ -9,6 +9,7 @@ namespace ProjetoPlanetario.Narrativa.Diretor;
 public sealed class DiretorNarrativo
 {
     private readonly BarramentoDeEventos _barramentoDeEventos;
+    private bool _alertaDeEstabilidadeCriticaEnviado;
 
     public string UltimaLinha { get; private set; } = "ORION: Perfil DESKTOP_DEV em inicializacao.";
 
@@ -28,8 +29,18 @@ public sealed class DiretorNarrativo
             case EnergiaAlterada evento when evento.EnergiaAtual <= 50f:
                 SolicitarDialogo("Gatinho", "Energia abaixo da metade. Hora de pilotar com carinho.");
                 break;
+            case EstabilidadeDaDobraAlterada evento when evento.EstabilidadeAtual <= 25f && !_alertaDeEstabilidadeCriticaEnviado:
+                _alertaDeEstabilidadeCriticaEnviado = true;
+                SolicitarDialogo("ORION", "Estabilidade de dobra critica. Realinhe a rota ou solicite apoio da tripulacao.");
+                break;
+            case EstabilidadeDaDobraAlterada evento when evento.EstabilidadeAtual >= 55f:
+                _alertaDeEstabilidadeCriticaEnviado = false;
+                break;
+            case RotaSelecionada evento:
+                SolicitarDialogo("ORION", $"Rota demonstrativa para {evento.NomeDaRota} marcada no painel.");
+                break;
             case AcaoDoPilotoExecutada:
-                SolicitarDialogo("ORION", "Pulso de teste executado pela acao primaria.");
+                SolicitarDialogo("ORION", "Estabilizador de dobra acionado.");
                 break;
             case EstacaoAcaoExecutada evento:
                 SolicitarDialogo("Gatinho", $"{evento.IdentificadorDaEstacao} enviou {evento.NomeDaAcao}.");
