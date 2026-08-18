@@ -9,6 +9,12 @@ public static class ConfiguradorInputMap
 {
     public static void GarantirAcoesDesktopDev()
     {
+        GarantirAcaoDeTeclas("piloto_avancar", Key.W);
+        GarantirAcaoDeTeclas("piloto_recuar", Key.S);
+        GarantirAcaoDeTeclas("camera_esquerda", Key.A, Key.Left);
+        GarantirAcaoDeTeclas("camera_direita", Key.D, Key.Right);
+        GarantirAcaoDeTeclas("camera_cima", Key.Up);
+        GarantirAcaoDeTeclas("camera_baixo", Key.Down);
         GarantirAcaoDeTeclas("piloto_mover_esquerda", Key.A, Key.Left);
         GarantirAcaoDeTeclas("piloto_mover_direita", Key.D, Key.Right);
         GarantirAcaoDeTeclas("piloto_mover_cima", Key.Up);

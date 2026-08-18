@@ -11,6 +11,11 @@
     <Compile Include="..\Jogabilidade\Eventos\EstadoDoLoopCentral.cs" Link="Jogabilidade\Eventos\EstadoDoLoopCentral.cs" />
     <Compile Include="..\Jogabilidade\Eventos\EstadoEventoDeCalibracao.cs" Link="Jogabilidade\Eventos\EstadoEventoDeCalibracao.cs" />
     <Compile Include="..\Jogabilidade\Eventos\EventoDeCalibracao.cs" Link="Jogabilidade\Eventos\EventoDeCalibracao.cs" />
+    <Compile Include="..\Jogabilidade\Viagem\EstadoDoSegmentoDeViagem.cs" Link="Jogabilidade\Viagem\EstadoDoSegmentoDeViagem.cs" />
+    <Compile Include="..\Jogabilidade\Viagem\MarcadorDeRota.cs" Link="Jogabilidade\Viagem\MarcadorDeRota.cs" />
+    <Compile Include="..\Jogabilidade\Viagem\ResultadoAtualizacaoSegmento.cs" Link="Jogabilidade\Viagem\ResultadoAtualizacaoSegmento.cs" />
+    <Compile Include="..\Jogabilidade\Viagem\SegmentoDeViagem.cs" Link="Jogabilidade\Viagem\SegmentoDeViagem.cs" />
+    <Compile Include="..\Jogabilidade\Viagem\TipoMarcadorDeRota.cs" Link="Jogabilidade\Viagem\TipoMarcadorDeRota.cs" />
     <Compile Include="..\Nucleo\Estado\EstadoDaNave.cs" Link="Nucleo\Estado\EstadoDaNave.cs" />
     <Compile Include="..\Nucleo\Eventos\BarramentoDeEventos.cs" Link="Nucleo\Eventos\BarramentoDeEventos.cs" />
     <Compile Include="..\Nucleo\Eventos\EventoDeDominio.cs" Link="Nucleo\Eventos\EventoDeDominio.cs" />

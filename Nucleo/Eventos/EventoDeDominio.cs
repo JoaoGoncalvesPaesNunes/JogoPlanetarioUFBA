@@ -40,4 +40,24 @@ public sealed record LoopCentralReiniciado(DateTime MomentoUtc) : EventoDeDomini
 
 public sealed record EstacaoAcaoExecutada(string IdentificadorDaEstacao, string NomeDaAcao, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
+public sealed record SegmentoDeViagemIniciado(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record ProgressoNaRotaAlterado(float ProgressoAtual, float VelocidadeAtual, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record MarcadorDeRotaAlcancado(string Id, string Tipo, float Progresso, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record AproximacaoCometa(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record PassagemCometa(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record AvisoDeSalto(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record SaltoGravitacionalIniciado(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record SaltoGravitacionalConcluido(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record SegmentoDeViagemConcluido(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
+public sealed record SegmentoDeViagemReiniciado(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
 public sealed record DialogoSolicitado(string Personagem, string Texto, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);

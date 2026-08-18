@@ -11,16 +11,16 @@ public sealed class AdaptadorTecladoMouse : IEntradaDoPiloto
 {
     public EstadoEntradaPiloto LerEstado()
     {
-        var movimento = Input.GetVector(
-            "piloto_mover_esquerda",
-            "piloto_mover_direita",
-            "piloto_mover_cima",
-            "piloto_mover_baixo");
-        var impulsoFrontal = Input.GetActionStrength("piloto_acelerar") - Input.GetActionStrength("piloto_frear");
+        var movimentoDaCamera = Input.GetVector(
+            "camera_esquerda",
+            "camera_direita",
+            "camera_cima",
+            "camera_baixo");
+        var movimentoNaRota = Input.GetActionStrength("piloto_avancar") - Input.GetActionStrength("piloto_recuar");
 
         return new EstadoEntradaPiloto(
-            movimento,
-            impulsoFrontal,
+            movimentoDaCamera,
+            movimentoNaRota,
             Input.IsActionPressed("piloto_acao_primaria"),
             Input.IsActionJustPressed("piloto_acao_primaria"),
             Input.IsActionJustPressed("piloto_confirmar"),

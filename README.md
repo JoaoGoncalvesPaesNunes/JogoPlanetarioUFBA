@@ -22,20 +22,17 @@ E:\Godot\Godot_v4.7.1-stable_mono_win64.exe --path E:\Projetos\PlanetarioUFBA\Jo
 
 Observacao: use a edicao .NET/C# da Godot. O build sem `mono` nao carrega scripts `.cs`.
 
-## Controles do microprototipo
+## Controles principais
 
-- `W`: acelerar para frente.
-- `S`: frear.
-- `A`/`D` ou setas esquerda/direita: alinhar o reticulo na horizontal.
-- Setas cima/baixo: alinhar o reticulo na vertical.
-- Mantenha o reticulo alinhado ao waypoint para encher a barra de aproximacao.
-- Ao alcancar o waypoint, a cena passa a aguardar a estacao virtual.
-- Estacao virtual `ACAO 1`: iniciar suporte da tripulacao.
-- Estacao virtual `CONFIRMAR`: concluir calibracao depois de `ACAO 1`.
-- `Espaco`: acionar estabilizador de dobra, consumindo energia e aumentando estabilidade.
+- `W`: avancar pela rota on-rails.
+- `S`: recuar pela rota on-rails.
+- Soltar `W`/`S`: a nave desacelera ate parar.
+- `A`/`D` ou setas esquerda/direita: olhar para os lados.
+- Setas cima/baixo: olhar para cima/baixo.
 - Mouse: clicar nos botoes da estacao virtual.
-- Estacao virtual `ESQ`/`DIR`: selecionar rota demonstrativa Marte/Jupiter.
-- Estacao virtual `ACAO 2`: comando livre de teste, sem avancar a calibracao.
+- Ao final do segmento, `CONFIRMAR` na estacao virtual reinicia o teste.
+
+A nave nao controla direcao lateral. Ela permanece presa a uma trajetoria predefinida; o piloto controla ritmo e camera.
 
 ## Validacao
 
@@ -51,9 +48,14 @@ O build C#, os testes de dominio e a carga headless da cena foram validados com 
 
 - Perfil funcional `DesktopDev`.
 - Adaptador `AdaptadorTecladoMouse` lendo acoes logicas do Input Map.
-- Cena principal `CenaCockpitLoopCentral`.
+- Cena principal `CenaNavegacaoOnRails`.
 - Camera de primeira pessoa e cockpit graybox.
-- Loop central de dois waypoints com evento cooperativo.
+- Navegacao on-rails com `Path3D`/`PathFollow3D`.
+- Avanco, re, parada e camera livre limitada.
+- Cometa 3D placeholder proximo da rota.
+- Marcadores narrativos por progresso fisico.
+- Flash/fade simples de salto gravitacional.
+- Loop central de dois waypoints preservado em `CenaCockpitLoopCentral`.
 - `EstadoDaNave` puro com energia, integridade, estabilidade da dobra e carga de dobra.
 - `BarramentoDeEventos` tipado.
 - HUD de debug.

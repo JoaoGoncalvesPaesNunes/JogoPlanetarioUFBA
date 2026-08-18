@@ -20,11 +20,16 @@ public partial class ControladorDeVoo : Node3D
     private float _ultimoAlinhamentoPublicado = -1f;
     private float _ultimoEstabilidadePublicada = -1f;
     private float _ultimaVelocidadePublicada = -1f;
+    private Camera3D? _cameraDoPiloto;
+    private float _rotacaoCameraHorizontal;
+    private float _rotacaoCameraVertical;
 
     public Vector2 ApontamentoDoPiloto { get; private set; }
     public Vector2 PontoDeDobra { get; private set; } = new(0.36f, 0.18f);
     public float AlinhamentoDaRota { get; private set; }
     public float VelocidadeFrontalAtual { get; private set; }
+    public float MovimentoNaRotaAtual { get; private set; }
+    public Vector2 RotacaoCameraGraus => new(_rotacaoCameraHorizontal, _rotacaoCameraVertical);
 
     public void Configurar(
         IEntradaDoPiloto entradaDoPiloto,
@@ -36,6 +41,11 @@ public partial class ControladorDeVoo : Node3D
         _estadoDaNave = estadoDaNave;
         _barramentoDeEventos = barramentoDeEventos;
         _configuracaoDaNave = configuracaoDaNave;
+    }
+
+    public override void _Ready()
+    {
+        _cameraDoPiloto = GetNodeOrNull<Camera3D>("CameraPiloto") ?? GetNodeOrNull<Camera3D>("CameraPrimeiraPessoa");
     }
 
     public void DefinirPontoDeDobra(Vector2 pontoDeDobra)
@@ -53,27 +63,30 @@ public partial class ControladorDeVoo : Node3D
         }
 
         var estadoEntrada = _entradaDoPiloto.LerEstado();
-        var movimento = estadoEntrada.Movimento;
+        var movimento = estadoEntrada.MovimentoDaCamera;
         var deltaFloat = (float)delta;
+        MovimentoNaRotaAtual = estadoEntrada.MovimentoNaRota;
 
-        AtualizarVelocidadeFrontal(estadoEntrada.ImpulsoFrontal, deltaFloat);
+        AtualizarVelocidadeFrontal(estadoEntrada.MovimentoNaRota, deltaFloat);
+        AtualizarCamera(movimento, deltaFloat);
 
-        ApontamentoDoPiloto += new Vector2(movimento.X, movimento.Y) * _configuracaoDaNave.SensibilidadeDeMira * deltaFloat;
-        ApontamentoDoPiloto = LimitarComprimento(ApontamentoDoPiloto, 1f);
+        ApontamentoDoPiloto = new Vector2(
+            _rotacaoCameraHorizontal / _configuracaoDaNave.LimiteCameraHorizontalGraus,
+            _rotacaoCameraVertical / _configuracaoDaNave.LimiteCameraVerticalGraus);
 
         var desvio = PontoDeDobra - ApontamentoDoPiloto;
         AlinhamentoDaRota = 1f - Mathf.Clamp(desvio.Length() / 1.1f, 0f, 1f);
 
-        if (movimento.LengthSquared() > 0.001f)
+        if (_cameraDoPiloto is null && movimento.LengthSquared() > 0.001f)
         {
-            Position = new Vector3(-ApontamentoDoPiloto.X * 0.18f, ApontamentoDoPiloto.Y * 0.12f, 0f);
+            Position = new Vector3(0f, 0f, 0f);
         }
 
         var rotacaoAlvo = new Vector3(
-            -ApontamentoDoPiloto.Y * 0.08f,
-            -ApontamentoDoPiloto.X * 0.1f,
+            -ApontamentoDoPiloto.Y * 0.04f,
+            -ApontamentoDoPiloto.X * 0.05f,
             -movimento.X * 0.08f);
-        Rotation = Rotation.Lerp(rotacaoAlvo, _configuracaoDaNave.SuavizacaoRotacao * deltaFloat);
+        Rotation = Rotation.Lerp(rotacaoAlvo, Mathf.Clamp(_configuracaoDaNave.SuavizacaoRotacao * deltaFloat, 0f, 1f));
 
         if ((movimento - _ultimoMovimentoPublicado).LengthSquared() > 0.01f)
         {
@@ -125,27 +138,46 @@ public partial class ControladorDeVoo : Node3D
         }
     }
 
-    private void AtualizarVelocidadeFrontal(float impulsoFrontal, float delta)
+    public void RecentralizarCamera()
+    {
+        _rotacaoCameraHorizontal = 0f;
+        _rotacaoCameraVertical = 0f;
+        ApontamentoDoPiloto = Vector2.Zero;
+
+        if (_cameraDoPiloto is not null)
+        {
+            _cameraDoPiloto.RotationDegrees = Vector3.Zero;
+        }
+    }
+
+    public void ZerarVelocidade()
+    {
+        VelocidadeFrontalAtual = 0f;
+        MovimentoNaRotaAtual = 0f;
+        _ultimaVelocidadePublicada = -1f;
+    }
+
+    private void AtualizarVelocidadeFrontal(float movimentoNaRota, float delta)
     {
         if (_barramentoDeEventos is null)
         {
             return;
         }
 
-        if (impulsoFrontal > 0f)
+        if (movimentoNaRota > 0f)
         {
-            VelocidadeFrontalAtual += impulsoFrontal * _configuracaoDaNave.AceleracaoFrontal * delta;
+            VelocidadeFrontalAtual += movimentoNaRota * _configuracaoDaNave.AceleracaoFrontal * delta;
         }
-        else if (impulsoFrontal < 0f)
+        else if (movimentoNaRota < 0f)
         {
-            VelocidadeFrontalAtual += impulsoFrontal * _configuracaoDaNave.FreioFrontal * delta;
+            VelocidadeFrontalAtual += movimentoNaRota * _configuracaoDaNave.FreioFrontal * delta;
         }
         else
         {
             VelocidadeFrontalAtual = Mathf.MoveToward(VelocidadeFrontalAtual, 0f, _configuracaoDaNave.ArrastoFrontal * delta);
         }
 
-        VelocidadeFrontalAtual = Mathf.Clamp(VelocidadeFrontalAtual, 0f, _configuracaoDaNave.VelocidadeFrontalMaxima);
+        VelocidadeFrontalAtual = Mathf.Clamp(VelocidadeFrontalAtual, -_configuracaoDaNave.VelocidadeReMaxima, _configuracaoDaNave.VelocidadeFrontalMaxima);
 
         if (Math.Abs(VelocidadeFrontalAtual - _ultimaVelocidadePublicada) >= 0.08f)
         {
@@ -154,10 +186,21 @@ public partial class ControladorDeVoo : Node3D
         }
     }
 
-    private static Vector2 LimitarComprimento(Vector2 valor, float comprimentoMaximo)
+    private void AtualizarCamera(Vector2 movimentoDaCamera, float delta)
     {
-        return valor.Length() > comprimentoMaximo
-            ? valor.Normalized() * comprimentoMaximo
-            : valor;
+        _rotacaoCameraHorizontal = Mathf.Clamp(
+            _rotacaoCameraHorizontal + movimentoDaCamera.X * _configuracaoDaNave.SensibilidadeDaCamera * delta,
+            -_configuracaoDaNave.LimiteCameraHorizontalGraus,
+            _configuracaoDaNave.LimiteCameraHorizontalGraus);
+
+        _rotacaoCameraVertical = Mathf.Clamp(
+            _rotacaoCameraVertical - movimentoDaCamera.Y * _configuracaoDaNave.SensibilidadeDaCamera * delta,
+            -_configuracaoDaNave.LimiteCameraVerticalGraus,
+            _configuracaoDaNave.LimiteCameraVerticalGraus);
+
+        if (_cameraDoPiloto is not null)
+        {
+            _cameraDoPiloto.RotationDegrees = new Vector3(_rotacaoCameraVertical, _rotacaoCameraHorizontal, 0f);
+        }
     }
 }

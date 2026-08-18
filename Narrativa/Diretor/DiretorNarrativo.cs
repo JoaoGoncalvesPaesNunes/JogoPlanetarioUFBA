@@ -29,6 +29,24 @@ public sealed class DiretorNarrativo
             case SessaoDeTesteIniciada:
                 SolicitarDialogo("ORION", "Sistemas de teste operacionais. Dirija-se ao ponto de calibracao.");
                 break;
+            case SegmentoDeViagemIniciado:
+                SolicitarDialogo("ORION", "Trajetoria de teste carregada. Controle apenas o avanco e a observacao.");
+                break;
+            case AproximacaoCometa:
+                SolicitarDialogo("ORION", "Objeto cometario detectado. Passagem proxima em instantes.");
+                break;
+            case PassagemCometa:
+                SolicitarDialogo("ORION", "Cometa em passagem. Observe pela lateral da cabine.");
+                break;
+            case AvisoDeSalto:
+                SolicitarDialogo("ORION", "Anomalia gravitacional a frente. Preparando salto.");
+                break;
+            case SaltoGravitacionalIniciado:
+                SolicitarDialogo("ORION", "Estabilizando campo gravitacional.");
+                break;
+            case SaltoGravitacionalConcluido:
+                SolicitarDialogo("ORION", "Salto concluido. Segmento de teste encerrado.");
+                break;
             case WaypointAlcancado evento:
                 SolicitarDialogo("ORION", $"Ponto de calibracao {evento.NumeroDoWaypoint} alcancado.");
                 break;

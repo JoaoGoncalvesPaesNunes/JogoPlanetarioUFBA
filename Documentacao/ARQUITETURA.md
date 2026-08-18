@@ -12,6 +12,7 @@ Este projeto usa uma base simples inspirada em Ports & Adapters apenas onde isso
 - Eventos de dominio passam por `BarramentoDeEventos`, instanciado pela cena principal. Nao foi criado Autoload nesta etapa para evitar estado global prematuro.
 - A apresentacao usa `IPortaDeProjecao`; `AdaptadorProjecaoDesktop` funciona em monitor e `AdaptadorProjecaoPlanetario` fica como stub ate existirem especificacoes reais do domo.
 - O `DiretorNarrativo` reage a eventos e publica pedidos de dialogo sem conhecer audio, animacao ou layout.
+- A navegacao principal passa a ser on-rails: progresso fisico na rota e progresso narrativo sao estados separados.
 
 ## Estrutura criada
 
@@ -38,6 +39,16 @@ A cena principal agora e `CenaCockpitLoopCentral`, uma primeira fatia jogavel em
 O `ControladorDeVoo` calcula `ApontamentoDoPiloto`, `PontoDeDobra`, `AlinhamentoDaRota` e `VelocidadeFrontalAtual`. Quando ha velocidade e alinhamento bom, `ControladorDoLoopCentral` acumula progresso de aproximacao ate disparar `WaypointAlcancado` e `CalibracaoIniciada`.
 
 A calibracao depende da estacao virtual: `ACAO 1` prepara suporte e `CONFIRMAR` conclui. Cada calibracao adiciona 50% de `CargaDeDobra`; dois ciclos concluem a sequencia. Ao final, `CONFIRMAR` reinicia o loop sem reiniciar a aplicacao.
+
+## Marco 3 - Navegacao on-rails
+
+A cena principal agora e `CenaNavegacaoOnRails`. Ela usa `Path3D` e `PathFollow3D` para prender a nave a uma trajetoria suave. O piloto controla `MovimentoNaRota`, podendo avancar, recuar e parar; a camera rotaciona separadamente com limites horizontais e verticais.
+
+O conceito minimo `SegmentoDeViagem` guarda `ProgressoNaRota` e marcadores narrativos. Dar re altera apenas o progresso fisico. Marcadores com `ExecutarUmaVez` nao disparam novamente quando o jogador recua e cruza a mesma posicao outra vez.
+
+O segmento atual inclui aproximacao de cometa, passagem pelo cometa, aviso de anomalia e inicio de salto gravitacional. O efeito de salto fica em `ApresentacaoDoSalto`, acionado por eventos de dominio, sem regra de gameplay dentro da apresentacao.
+
+Esta decisao prepara futuras viagens coreografadas, combate em trilhos, dublagem sincronizada e testes em planetario com menor risco de desorientacao.
 
 ## Ambiente de execucao
 

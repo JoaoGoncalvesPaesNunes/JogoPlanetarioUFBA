@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using ProjetoPlanetario.Entrada.Modelos;
 using ProjetoPlanetario.Jogabilidade.Eventos;
+using ProjetoPlanetario.Jogabilidade.Viagem;
 using ProjetoPlanetario.Nucleo.Estado;
 using ProjetoPlanetario.Nucleo.Eventos;
 
@@ -54,6 +56,35 @@ Garantir(loop.Estado == EstadoDoLoopCentral.Concluido, "Loop deve concluir apos 
 loop.ReceberAcaoDaEstacao(AcaoLogicaDaEstacao.Confirmar);
 Garantir(loop.Estado == EstadoDoLoopCentral.Navegando, "Confirmar ao final deve reiniciar o loop.");
 Garantir(Math.Abs(estadoDoLoop.CargaDeDobra) < 0.001f, "Reinicio deve zerar carga de dobra.");
+
+var segmento = SegmentoDeViagem.CriarSegmentoCometa();
+segmento.Iniciar();
+Garantir(segmento.Estado == EstadoDoSegmentoDeViagem.EmViagem, "Segmento deve iniciar em viagem.");
+segmento.Atualizar(-1f, 2f);
+Garantir(Math.Abs(segmento.ProgressoNaRota) < 0.001f, "Progresso nao deve ficar abaixo do inicio.");
+
+var resultadoAteCometa = segmento.Atualizar(0.2f, 2.8f);
+Garantir(segmento.ProgressoNaRota > 0.5f && segmento.ProgressoNaRota < 0.6f, "Segmento deve avancar fisicamente pela rota.");
+Garantir(resultadoAteCometa.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.AproximacaoCometa), "Aproximacao do cometa deve disparar.");
+Garantir(resultadoAteCometa.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.PassagemCometa), "Passagem do cometa deve disparar.");
+
+segmento.Atualizar(-0.2f, 1f);
+var resultadoRepetido = segmento.Atualizar(0.2f, 1f);
+Garantir(!resultadoRepetido.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.AproximacaoCometa), "Aproximacao nao deve repetir depois de dar re.");
+Garantir(!resultadoRepetido.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.PassagemCometa), "Passagem nao deve repetir depois de dar re.");
+
+var resultadoFim = segmento.Atualizar(1f, 2f);
+Garantir(segmento.ProgressoNaRota <= 1f, "Progresso nao deve passar do fim.");
+Garantir(resultadoFim.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.InicioSalto), "Inicio do salto deve disparar no fim.");
+Garantir(segmento.Estado == EstadoDoSegmentoDeViagem.Saltando, "Segmento deve entrar em salto.");
+segmento.ConcluirSalto();
+Garantir(segmento.Estado == EstadoDoSegmentoDeViagem.Concluido, "Segmento deve concluir salto.");
+segmento.ConcluirSalto();
+Garantir(segmento.Estado == EstadoDoSegmentoDeViagem.Concluido, "Concluir salto novamente nao deve alterar estado.");
+
+segmento.Iniciar();
+var resultadoRearmado = segmento.Atualizar(0.2f, 2.8f);
+Garantir(resultadoRearmado.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.AproximacaoCometa), "Reinicio deve rearmar marcadores.");
 
 Console.WriteLine("Testes de dominio concluidos com sucesso.");
 

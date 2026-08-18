@@ -13,6 +13,10 @@ public partial class HUDDeDebug : CanvasLayer
     private string _ultimaAcao = "Aguardando entrada...";
     private string _rotaAtual = "Ponto de dobra";
     private float _alinhamentoDaRota;
+    private float _velocidadeAtual;
+    private float _progressoNaRota;
+    private string _ultimoMarcador = "-";
+    private string _estadoDoSegmento = "NaoIniciado";
     private Label? _texto;
     private EstadoDaNave? _estadoDaNave;
     private ConfiguracaoDeExecucao? _configuracaoDeExecucao;
@@ -57,6 +61,10 @@ public partial class HUDDeDebug : CanvasLayer
             $"Estabilidade: {_estadoDaNave.EstabilidadeDaDobra:0}\n" +
             $"Carga de dobra: {_estadoDaNave.CargaDeDobra:0}\n" +
             $"Alinhamento: {_alinhamentoDaRota * 100f:0}%\n" +
+            $"Movimento na rota: {_velocidadeAtual * 100f:0}%\n" +
+            $"Progresso na rota: {_progressoNaRota * 100f:0}%\n" +
+            $"Ultimo marcador: {_ultimoMarcador}\n" +
+            $"Estado segmento: {_estadoDoSegmento}\n" +
             $"Rota: {_rotaAtual}\n" +
             $"Ultima acao: {_ultimaAcao}\n" +
             $"Narrativa: {_diretorNarrativo.UltimaLinha}\n\n" +
@@ -75,6 +83,15 @@ public partial class HUDDeDebug : CanvasLayer
             EstabilidadeDaDobraAlterada evento => $"Estabilidade: {evento.EstabilidadeAtual:0} ({evento.Motivo})",
             AlinhamentoDaRotaAlterado evento => $"Alinhamento: {evento.AlinhamentoAtual * 100f:0}%",
             VelocidadeDaNaveAlterada evento => $"Velocidade: {evento.VelocidadeAtual * 100f:0}%",
+            ProgressoNaRotaAlterado evento => $"Rota: {evento.ProgressoAtual * 100f:0}%",
+            MarcadorDeRotaAlcancado evento => $"Marcador: {evento.Tipo}",
+            SegmentoDeViagemIniciado => "Segmento iniciado",
+            SegmentoDeViagemConcluido => "Segmento concluido",
+            SaltoGravitacionalIniciado => "Salto iniciado",
+            SaltoGravitacionalConcluido => "Salto concluido",
+            AproximacaoCometa => "Aproximacao do cometa",
+            PassagemCometa => "Passagem pelo cometa",
+            AvisoDeSalto => "Aviso de salto",
             RotaSelecionada evento => $"Rota selecionada: {evento.NomeDaRota}",
             ObjetivoAlterado evento => $"Objetivo: {evento.TextoDoObjetivo}",
             ProgressoDoWaypointAlterado evento => $"WP {evento.NumeroDoWaypoint}: {evento.ProgressoAtual:0}%",
@@ -97,6 +114,39 @@ public partial class HUDDeDebug : CanvasLayer
         if (eventoDeDominio is RotaSelecionada rota)
         {
             _rotaAtual = rota.NomeDaRota;
+        }
+
+        if (eventoDeDominio is VelocidadeDaNaveAlterada velocidade)
+        {
+            _velocidadeAtual = velocidade.VelocidadeAtual;
+        }
+
+        if (eventoDeDominio is ProgressoNaRotaAlterado progressoNaRota)
+        {
+            _progressoNaRota = progressoNaRota.ProgressoAtual;
+        }
+
+        if (eventoDeDominio is MarcadorDeRotaAlcancado marcador)
+        {
+            _ultimoMarcador = marcador.Tipo;
+        }
+
+        switch (eventoDeDominio)
+        {
+            case SegmentoDeViagemIniciado:
+                _estadoDoSegmento = "EmViagem";
+                break;
+            case SaltoGravitacionalIniciado:
+                _estadoDoSegmento = "Saltando";
+                break;
+            case SegmentoDeViagemConcluido:
+                _estadoDoSegmento = "Concluido";
+                break;
+            case SegmentoDeViagemReiniciado:
+                _estadoDoSegmento = "EmViagem";
+                _progressoNaRota = 0f;
+                _ultimoMarcador = "-";
+                break;
         }
 
         _ultimaAcao = linha;

@@ -3,6 +3,7 @@ using ProjetoPlanetario.Jogabilidade.Eventos;
 using ProjetoPlanetario.Jogabilidade.Voo;
 using ProjetoPlanetario.Narrativa.Diretor;
 using ProjetoPlanetario.Nucleo.Estado;
+using ProjetoPlanetario.Nucleo.Eventos;
 
 namespace ProjetoPlanetario.Apresentacao.HUD;
 
@@ -17,6 +18,8 @@ public partial class CockpitDoPiloto : Control
     private EstadoDaNave? _estadoDaNave;
     private float _pulso;
     private string _rotaAtual = "Ponto de dobra";
+    private string _objetivoAtual = "Avance pela rota de teste.";
+    private float _progressoNaRota;
     private Label? _textoObjetivo;
     private Label? _textoOrion;
     private Label? _textoStatus;
@@ -25,12 +28,18 @@ public partial class CockpitDoPiloto : Control
         ControladorDeVoo controladorDeVoo,
         EstadoDaNave estadoDaNave,
         ControladorDoLoopCentral? controladorDoLoopCentral = null,
-        DiretorNarrativo? diretorNarrativo = null)
+        DiretorNarrativo? diretorNarrativo = null,
+        BarramentoDeEventos? barramentoDeEventos = null)
     {
         _controladorDeVoo = controladorDeVoo;
         _estadoDaNave = estadoDaNave;
         _controladorDoLoopCentral = controladorDoLoopCentral;
         _diretorNarrativo = diretorNarrativo;
+
+        if (barramentoDeEventos is not null)
+        {
+            barramentoDeEventos.EventoPublicado += AoEventoPublicado;
+        }
     }
 
     public void DefinirRotaAtual(string rotaAtual)
@@ -145,6 +154,10 @@ public partial class CockpitDoPiloto : Control
         {
             DesenharBarra(new Vector2(tamanho.X * 0.52f, y + 30f), new Vector2(tamanho.X * 0.16f, 14f), _controladorDoLoopCentral.ProgressoDoWaypoint / 100f, new Color(0.95f, 0.45f, 0.25f, 0.95f));
         }
+        else
+        {
+            DesenharBarra(new Vector2(tamanho.X * 0.52f, y + 30f), new Vector2(tamanho.X * 0.16f, 14f), _progressoNaRota, new Color(0.95f, 0.45f, 0.25f, 0.95f));
+        }
     }
 
     private void DesenharBarra(Vector2 posicao, Vector2 tamanho, float proporcao, Color cor)
@@ -178,7 +191,7 @@ public partial class CockpitDoPiloto : Control
 
         if (_textoObjetivo is not null)
         {
-            _textoObjetivo.Text = _controladorDoLoopCentral?.ObjetivoAtual ?? "Alinhe a nave com o ponto de dobra.";
+            _textoObjetivo.Text = _controladorDoLoopCentral?.ObjetivoAtual ?? _objetivoAtual;
         }
 
         if (_textoOrion is not null)
@@ -191,8 +204,27 @@ public partial class CockpitDoPiloto : Control
             var progresso = _controladorDoLoopCentral?.ProgressoDoWaypoint ?? 0f;
             var waypoint = _controladorDoLoopCentral?.NumeroDoWaypoint ?? 1;
             _textoStatus.Text =
-                $"WP {waypoint}  Aproximacao {progresso:0}%\n" +
+                (_controladorDoLoopCentral is not null
+                    ? $"WP {waypoint}  Aproximacao {progresso:0}%\n"
+                    : $"Rota {_progressoNaRota * 100f:0}%  Camera {_controladorDeVoo?.RotacaoCameraGraus.X:0},{_controladorDeVoo?.RotacaoCameraGraus.Y:0}\n") +
                 $"Vel {_controladorDeVoo?.VelocidadeFrontalAtual * 100f:0}%  Dobra {_estadoDaNave.CargaDeDobra:0}%";
+        }
+    }
+
+    private void AoEventoPublicado(EventoDeDominio eventoDeDominio)
+    {
+        switch (eventoDeDominio)
+        {
+            case ObjetivoAlterado evento:
+                _objetivoAtual = evento.TextoDoObjetivo;
+                break;
+            case ProgressoNaRotaAlterado evento:
+                _progressoNaRota = evento.ProgressoAtual;
+                break;
+            case SegmentoDeViagemReiniciado:
+                _progressoNaRota = 0f;
+                _objetivoAtual = "Avance pela rota de teste.";
+                break;
         }
     }
 }
