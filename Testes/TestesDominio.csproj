@@ -6,6 +6,11 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Entrada\Modelos\AcaoLogicaDaEstacao.cs" Link="Entrada\Modelos\AcaoLogicaDaEstacao.cs" />
+    <Compile Include="..\Jogabilidade\Eventos\ControladorDoLoopCentral.cs" Link="Jogabilidade\Eventos\ControladorDoLoopCentral.cs" />
+    <Compile Include="..\Jogabilidade\Eventos\EstadoDoLoopCentral.cs" Link="Jogabilidade\Eventos\EstadoDoLoopCentral.cs" />
+    <Compile Include="..\Jogabilidade\Eventos\EstadoEventoDeCalibracao.cs" Link="Jogabilidade\Eventos\EstadoEventoDeCalibracao.cs" />
+    <Compile Include="..\Jogabilidade\Eventos\EventoDeCalibracao.cs" Link="Jogabilidade\Eventos\EventoDeCalibracao.cs" />
     <Compile Include="..\Nucleo\Estado\EstadoDaNave.cs" Link="Nucleo\Estado\EstadoDaNave.cs" />
     <Compile Include="..\Nucleo\Eventos\BarramentoDeEventos.cs" Link="Nucleo\Eventos\BarramentoDeEventos.cs" />
     <Compile Include="..\Nucleo\Eventos\EventoDeDominio.cs" Link="Nucleo\Eventos\EventoDeDominio.cs" />

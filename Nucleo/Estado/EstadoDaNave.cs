@@ -10,12 +10,14 @@ public sealed class EstadoDaNave
     public float Energia { get; private set; }
     public float Integridade { get; private set; }
     public float EstabilidadeDaDobra { get; private set; }
+    public float CargaDeDobra { get; private set; }
 
-    public EstadoDaNave(float energiaInicial = 100f, float integridadeInicial = 100f, float estabilidadeDaDobraInicial = 62f)
+    public EstadoDaNave(float energiaInicial = 100f, float integridadeInicial = 100f, float estabilidadeDaDobraInicial = 62f, float cargaDeDobraInicial = 0f)
     {
         Energia = Math.Clamp(energiaInicial, 0f, 100f);
         Integridade = Math.Clamp(integridadeInicial, 0f, 100f);
         EstabilidadeDaDobra = Math.Clamp(estabilidadeDaDobraInicial, 0f, 100f);
+        CargaDeDobra = Math.Clamp(cargaDeDobraInicial, 0f, 100f);
     }
 
     public bool ConsumirEnergia(float quantidade)
@@ -64,5 +66,25 @@ public sealed class EstadoDaNave
         var estabilidadeAnterior = EstabilidadeDaDobra;
         EstabilidadeDaDobra = Math.Clamp(EstabilidadeDaDobra + variacao, 0f, 100f);
         return Math.Abs(estabilidadeAnterior - EstabilidadeDaDobra) > 0.001f;
+    }
+
+    public bool AdicionarCargaDeDobra(float quantidade)
+    {
+        if (quantidade <= 0f || CargaDeDobra >= 100f)
+        {
+            return false;
+        }
+
+        var cargaAnterior = CargaDeDobra;
+        CargaDeDobra = Math.Clamp(CargaDeDobra + quantidade, 0f, 100f);
+        return Math.Abs(cargaAnterior - CargaDeDobra) > 0.001f;
+    }
+
+    public void ReiniciarParaTeste(float energiaInicial = 100f, float integridadeInicial = 100f, float estabilidadeDaDobraInicial = 62f)
+    {
+        Energia = Math.Clamp(energiaInicial, 0f, 100f);
+        Integridade = Math.Clamp(integridadeInicial, 0f, 100f);
+        EstabilidadeDaDobra = Math.Clamp(estabilidadeDaDobraInicial, 0f, 100f);
+        CargaDeDobra = 0f;
     }
 }

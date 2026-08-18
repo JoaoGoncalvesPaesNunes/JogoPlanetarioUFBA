@@ -55,6 +55,7 @@ public partial class HUDDeDebug : CanvasLayer
             $"Energia: {_estadoDaNave.Energia:0}\n" +
             $"Integridade: {_estadoDaNave.Integridade:0}\n" +
             $"Estabilidade: {_estadoDaNave.EstabilidadeDaDobra:0}\n" +
+            $"Carga de dobra: {_estadoDaNave.CargaDeDobra:0}\n" +
             $"Alinhamento: {_alinhamentoDaRota * 100f:0}%\n" +
             $"Rota: {_rotaAtual}\n" +
             $"Ultima acao: {_ultimaAcao}\n" +
@@ -74,6 +75,14 @@ public partial class HUDDeDebug : CanvasLayer
             EstabilidadeDaDobraAlterada evento => $"Estabilidade: {evento.EstabilidadeAtual:0} ({evento.Motivo})",
             AlinhamentoDaRotaAlterado evento => $"Alinhamento: {evento.AlinhamentoAtual * 100f:0}%",
             RotaSelecionada evento => $"Rota selecionada: {evento.NomeDaRota}",
+            ObjetivoAlterado evento => $"Objetivo: {evento.TextoDoObjetivo}",
+            ProgressoDoWaypointAlterado evento => $"WP {evento.NumeroDoWaypoint}: {evento.ProgressoAtual:0}%",
+            WaypointAlcancado evento => $"Waypoint {evento.NumeroDoWaypoint} alcancado",
+            CalibracaoIniciada evento => $"Calibracao {evento.NumeroDoWaypoint} iniciada",
+            CalibracaoConcluida evento => $"Calibracao {evento.NumeroDoWaypoint} concluida",
+            CargaDeDobraAlterada evento => $"Carga de dobra: {evento.CargaAtual:0}%",
+            LoopCentralConcluido _ => "Loop central concluido",
+            LoopCentralReiniciado _ => "Loop central reiniciado",
             EstacaoAcaoExecutada evento => $"{evento.IdentificadorDaEstacao}: {evento.NomeDaAcao}",
             DialogoSolicitado evento => $"Dialogo {evento.Personagem}",
             _ => eventoDeDominio.GetType().Name

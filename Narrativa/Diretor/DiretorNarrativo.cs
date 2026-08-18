@@ -26,6 +26,24 @@ public sealed class DiretorNarrativo
             case PerfilDeExecucaoCarregado evento:
                 SolicitarDialogo("ORION", $"Perfil {evento.NomeDoPerfil} carregado. Sistemas em modo de teste.");
                 break;
+            case SessaoDeTesteIniciada:
+                SolicitarDialogo("ORION", "Sistemas de teste operacionais. Dirija-se ao ponto de calibracao.");
+                break;
+            case WaypointAlcancado evento:
+                SolicitarDialogo("ORION", $"Ponto de calibracao {evento.NumeroDoWaypoint} alcancado.");
+                break;
+            case CalibracaoIniciada:
+                SolicitarDialogo("ORION", "Instabilidade detectada. Uma estacao de suporte deve confirmar a calibracao.");
+                break;
+            case CalibracaoConcluida evento:
+                SolicitarDialogo("ORION", $"Calibracao {evento.NumeroDoWaypoint} concluida. Nucleo de dobra parcialmente carregado.");
+                break;
+            case CargaDeDobraAlterada evento when evento.CargaAtual >= 100f:
+                SolicitarDialogo("ORION", "Nucleo de dobra carregado. Sequencia de teste concluida.");
+                break;
+            case LoopCentralConcluido:
+                SolicitarDialogo("Gatinho", "Missao de teste completada. Eu chamaria isso de ciencia confortavel.");
+                break;
             case EnergiaAlterada evento when evento.EnergiaAtual <= 50f:
                 SolicitarDialogo("Gatinho", "Energia abaixo da metade. Hora de pilotar com carinho.");
                 break;

@@ -17,12 +17,11 @@ public partial class ControladorDeVoo : Node3D
     private BarramentoDeEventos? _barramentoDeEventos;
     private ConfiguracaoDaNave _configuracaoDaNave = new();
     private Vector2 _ultimoMovimentoPublicado;
-    private float _tempoDeRota;
     private float _ultimoAlinhamentoPublicado = -1f;
     private float _ultimoEstabilidadePublicada = -1f;
 
     public Vector2 ApontamentoDoPiloto { get; private set; }
-    public Vector2 PontoDeDobra { get; private set; }
+    public Vector2 PontoDeDobra { get; private set; } = new(0.36f, 0.18f);
     public float AlinhamentoDaRota { get; private set; }
 
     public void Configurar(
@@ -37,6 +36,13 @@ public partial class ControladorDeVoo : Node3D
         _configuracaoDaNave = configuracaoDaNave;
     }
 
+    public void DefinirPontoDeDobra(Vector2 pontoDeDobra)
+    {
+        PontoDeDobra = pontoDeDobra;
+        ApontamentoDoPiloto = Vector2.Zero;
+        _ultimoAlinhamentoPublicado = -1f;
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         if (_entradaDoPiloto is null || _estadoDaNave is null || _barramentoDeEventos is null)
@@ -47,11 +53,6 @@ public partial class ControladorDeVoo : Node3D
         var estadoEntrada = _entradaDoPiloto.LerEstado();
         var movimento = estadoEntrada.Movimento;
         var deltaFloat = (float)delta;
-
-        _tempoDeRota += deltaFloat;
-        PontoDeDobra = new Vector2(
-            Mathf.Sin(_tempoDeRota * 0.46f) * 0.48f,
-            Mathf.Cos(_tempoDeRota * 0.34f) * 0.32f);
 
         ApontamentoDoPiloto += new Vector2(movimento.X, movimento.Y) * _configuracaoDaNave.SensibilidadeDeMira * deltaFloat;
         ApontamentoDoPiloto = LimitarComprimento(ApontamentoDoPiloto, 1f);

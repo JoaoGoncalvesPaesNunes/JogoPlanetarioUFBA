@@ -8,7 +8,7 @@ Este projeto usa uma base simples inspirada em Ports & Adapters apenas onde isso
 - `AdaptadorTecladoMouse` traduz o Input Map da Godot para acoes logicas.
 - Estacoes de passageiros usam `IEntradaDeEstacao`; a UI `EstacaoVirtual` e apenas um adaptador de desenvolvimento.
 - O estado minimo da nave fica em `EstadoDaNave`, uma classe C# pura, para facilitar testes.
-- O primeiro loop central usa alinhamento de rota: o piloto move um reticulo logico, tenta coincidir com um ponto de dobra e afeta a estabilidade da nave.
+- O primeiro loop central usa alinhamento de rota: o piloto move um reticulo logico, tenta coincidir com waypoints de calibracao e aciona eventos cooperativos.
 - Eventos de dominio passam por `BarramentoDeEventos`, instanciado pela cena principal. Nao foi criado Autoload nesta etapa para evitar estado global prematuro.
 - A apresentacao usa `IPortaDeProjecao`; `AdaptadorProjecaoDesktop` funciona em monitor e `AdaptadorProjecaoPlanetario` fica como stub ate existirem especificacoes reais do domo.
 - O `DiretorNarrativo` reage a eventos e publica pedidos de dialogo sem conhecer audio, animacao ou layout.
@@ -33,12 +33,12 @@ O Input Map inicial e garantido em runtime por `ConfiguradorInputMap`. Isso mant
 
 ## Marco 2 - Cockpit e loop central
 
-A cena principal agora e uma primeira fatia jogavel em primeira pessoa. O jogador nao pilota mais uma nave vista de fora; a camera representa o ponto de vista do cockpit. A camada `CockpitDoPiloto` desenha uma estrutura temporaria com janela, reticulo, marcador de destino e barras de energia/alinhamento/estabilidade.
+A cena principal agora e `CenaCockpitLoopCentral`, uma primeira fatia jogavel em primeira pessoa. A cena anterior `CenaMicroPrototipo` permanece como referencia/debug. O jogador nao pilota mais uma nave vista de fora; a camera representa o ponto de vista do cockpit. A camada `CockpitDoPiloto` desenha uma estrutura temporaria com janela, reticulo, marcador de destino e barras de energia/alinhamento/carga de dobra.
 
-O `ControladorDeVoo` calcula `ApontamentoDoPiloto`, `PontoDeDobra` e `AlinhamentoDaRota`. Quando o alinhamento e bom, `EstadoDaNave.EstabilidadeDaDobra` sobe gradualmente; quando ruim, cai. A acao primaria aciona o estabilizador de dobra, consumindo energia e aumentando estabilidade.
+O `ControladorDeVoo` calcula `ApontamentoDoPiloto`, `PontoDeDobra` e `AlinhamentoDaRota`. Quando o alinhamento e bom, `ControladorDoLoopCentral` acumula progresso de aproximacao ate disparar `WaypointAlcancado` e `CalibracaoIniciada`.
 
-A estacao virtual ja interfere no loop: `ACAO 1` auxilia a estabilidade, `ACAO 2` redistribui energia, e `ESQ`/`DIR` selecionam rotas demonstrativas para Marte/Jupiter.
+A calibracao depende da estacao virtual: `ACAO 1` prepara suporte e `CONFIRMAR` conclui. Cada calibracao adiciona 50% de `CargaDeDobra`; dois ciclos concluem a sequencia. Ao final, `CONFIRMAR` reinicia o loop sem reiniciar a aplicacao.
 
-## Limitacao de ambiente encontrada
+## Ambiente de execucao
 
-O projeto foi criado como Godot C# e compilou com `Godot.NET.Sdk/4.7.1`. Entretanto, o executavel local encontrado em `E:\Godot` nao carregou scripts `.cs` durante o teste headless, indicando que nao e a edicao .NET/C# da Godot. A execucao visual do microprototipo deve ser validada com uma build .NET/C# da mesma versao ou compativel.
+O projeto foi criado como Godot C# e compilou com `Godot.NET.Sdk/4.7.1`. A cena principal foi validada em modo headless com `E:\Godot\Godot_v4.7.1-stable_mono_win64_console.exe`. Para execucao visual, usar a edicao .NET/C# da Godot; o build sem `mono` nao carrega scripts `.cs`.

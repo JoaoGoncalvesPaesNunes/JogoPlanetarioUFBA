@@ -1,5 +1,7 @@
 using Godot;
+using ProjetoPlanetario.Jogabilidade.Eventos;
 using ProjetoPlanetario.Jogabilidade.Voo;
+using ProjetoPlanetario.Narrativa.Diretor;
 using ProjetoPlanetario.Nucleo.Estado;
 
 namespace ProjetoPlanetario.Apresentacao.HUD;
@@ -10,14 +12,25 @@ namespace ProjetoPlanetario.Apresentacao.HUD;
 public partial class CockpitDoPiloto : Control
 {
     private ControladorDeVoo? _controladorDeVoo;
+    private ControladorDoLoopCentral? _controladorDoLoopCentral;
+    private DiretorNarrativo? _diretorNarrativo;
     private EstadoDaNave? _estadoDaNave;
     private float _pulso;
     private string _rotaAtual = "Ponto de dobra";
+    private Label? _textoObjetivo;
+    private Label? _textoOrion;
+    private Label? _textoStatus;
 
-    public void Configurar(ControladorDeVoo controladorDeVoo, EstadoDaNave estadoDaNave)
+    public void Configurar(
+        ControladorDeVoo controladorDeVoo,
+        EstadoDaNave estadoDaNave,
+        ControladorDoLoopCentral? controladorDoLoopCentral = null,
+        DiretorNarrativo? diretorNarrativo = null)
     {
         _controladorDeVoo = controladorDeVoo;
         _estadoDaNave = estadoDaNave;
+        _controladorDoLoopCentral = controladorDoLoopCentral;
+        _diretorNarrativo = diretorNarrativo;
     }
 
     public void DefinirRotaAtual(string rotaAtual)
@@ -29,11 +42,16 @@ public partial class CockpitDoPiloto : Control
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
         MouseFilter = MouseFilterEnum.Ignore;
+
+        _textoObjetivo = CriarLabel(new Vector2(170, 52), new Vector2(520, 64), 18);
+        _textoOrion = CriarLabel(new Vector2(170, 600), new Vector2(720, 72), 17);
+        _textoStatus = CriarLabel(new Vector2(900, 600), new Vector2(260, 72), 16);
     }
 
     public override void _Process(double delta)
     {
         _pulso += (float)delta;
+        AtualizarTextos();
         QueueRedraw();
     }
 
@@ -120,7 +138,12 @@ public partial class CockpitDoPiloto : Control
         var y = tamanho.Y * 0.835f;
         DesenharBarra(new Vector2(tamanho.X * 0.1f, y), new Vector2(tamanho.X * 0.18f, 18f), _estadoDaNave.Energia / 100f, new Color(0.15f, 0.75f, 1f, 0.95f));
         DesenharBarra(new Vector2(tamanho.X * 0.41f, y), new Vector2(tamanho.X * 0.18f, 18f), _controladorDeVoo.AlinhamentoDaRota, new Color(0.95f, 0.85f, 0.25f, 0.95f));
-        DesenharBarra(new Vector2(tamanho.X * 0.72f, y), new Vector2(tamanho.X * 0.18f, 18f), _estadoDaNave.EstabilidadeDaDobra / 100f, new Color(0.2f, 1f, 0.55f, 0.95f));
+        DesenharBarra(new Vector2(tamanho.X * 0.72f, y), new Vector2(tamanho.X * 0.18f, 18f), _estadoDaNave.CargaDeDobra / 100f, new Color(0.2f, 1f, 0.55f, 0.95f));
+
+        if (_controladorDoLoopCentral is not null)
+        {
+            DesenharBarra(new Vector2(tamanho.X * 0.41f, y + 30f), new Vector2(tamanho.X * 0.18f, 14f), _controladorDoLoopCentral.ProgressoDoWaypoint / 100f, new Color(0.95f, 0.45f, 0.25f, 0.95f));
+        }
     }
 
     private void DesenharBarra(Vector2 posicao, Vector2 tamanho, float proporcao, Color cor)
@@ -129,5 +152,46 @@ public partial class CockpitDoPiloto : Control
         DrawRect(new Rect2(posicao, tamanho), new Color(0.0f, 0.0f, 0.0f, 0.7f));
         DrawRect(new Rect2(posicao + new Vector2(2f, 2f), new Vector2((tamanho.X - 4f) * valor, tamanho.Y - 4f)), cor);
         DrawRect(new Rect2(posicao, tamanho), new Color(0.8f, 0.95f, 1f, 0.35f), false, 1f);
+    }
+
+    private Label CriarLabel(Vector2 posicao, Vector2 tamanho, int tamanhoFonte)
+    {
+        var label = new Label
+        {
+            Position = posicao,
+            Size = tamanho,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        label.AddThemeFontSizeOverride("font_size", tamanhoFonte);
+        AddChild(label);
+        return label;
+    }
+
+    private void AtualizarTextos()
+    {
+        if (_estadoDaNave is null)
+        {
+            return;
+        }
+
+        if (_textoObjetivo is not null)
+        {
+            _textoObjetivo.Text = _controladorDoLoopCentral?.ObjetivoAtual ?? "Alinhe a nave com o ponto de dobra.";
+        }
+
+        if (_textoOrion is not null)
+        {
+            _textoOrion.Text = _diretorNarrativo?.UltimaLinha ?? "ORION: Sistemas em modo de teste.";
+        }
+
+        if (_textoStatus is not null)
+        {
+            var progresso = _controladorDoLoopCentral?.ProgressoDoWaypoint ?? 0f;
+            var waypoint = _controladorDoLoopCentral?.NumeroDoWaypoint ?? 1;
+            _textoStatus.Text =
+                $"WP {waypoint}  Aproximacao {progresso:0}%\n" +
+                $"Energia {_estadoDaNave.Energia:0}  Dobra {_estadoDaNave.CargaDeDobra:0}%";
+        }
     }
 }
