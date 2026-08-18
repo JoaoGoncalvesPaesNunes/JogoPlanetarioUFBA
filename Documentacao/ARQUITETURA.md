@@ -35,7 +35,7 @@ O Input Map inicial e garantido em runtime por `ConfiguradorInputMap`. Isso mant
 
 A cena principal agora e `CenaCockpitLoopCentral`, uma primeira fatia jogavel em primeira pessoa. A cena anterior `CenaMicroPrototipo` permanece como referencia/debug. O jogador nao pilota mais uma nave vista de fora; a camera representa o ponto de vista do cockpit. A camada `CockpitDoPiloto` desenha uma estrutura temporaria com janela, reticulo, marcador de destino e barras de energia/alinhamento/carga de dobra.
 
-O `ControladorDeVoo` calcula `ApontamentoDoPiloto`, `PontoDeDobra` e `AlinhamentoDaRota`. Quando o alinhamento e bom, `ControladorDoLoopCentral` acumula progresso de aproximacao ate disparar `WaypointAlcancado` e `CalibracaoIniciada`.
+O `ControladorDeVoo` calcula `ApontamentoDoPiloto`, `PontoDeDobra`, `AlinhamentoDaRota` e `VelocidadeFrontalAtual`. Quando ha velocidade e alinhamento bom, `ControladorDoLoopCentral` acumula progresso de aproximacao ate disparar `WaypointAlcancado` e `CalibracaoIniciada`.
 
 A calibracao depende da estacao virtual: `ACAO 1` prepara suporte e `CONFIRMAR` conclui. Cada calibracao adiciona 50% de `CargaDeDobra`; dois ciclos concluem a sequencia. Ao final, `CONFIRMAR` reinicia o loop sem reiniciar a aplicacao.
 

@@ -11,8 +11,10 @@ public static class ConfiguradorInputMap
     {
         GarantirAcaoDeTeclas("piloto_mover_esquerda", Key.A, Key.Left);
         GarantirAcaoDeTeclas("piloto_mover_direita", Key.D, Key.Right);
-        GarantirAcaoDeTeclas("piloto_mover_cima", Key.W, Key.Up);
-        GarantirAcaoDeTeclas("piloto_mover_baixo", Key.S, Key.Down);
+        GarantirAcaoDeTeclas("piloto_mover_cima", Key.Up);
+        GarantirAcaoDeTeclas("piloto_mover_baixo", Key.Down);
+        GarantirAcaoDeTeclas("piloto_acelerar", Key.W);
+        GarantirAcaoDeTeclas("piloto_frear", Key.S);
         GarantirAcaoDeTeclas("piloto_acao_primaria", Key.Space);
         GarantirAcaoDeTeclas("piloto_confirmar", Key.Enter);
         GarantirAcaoDeTeclas("piloto_cancelar", Key.Escape);

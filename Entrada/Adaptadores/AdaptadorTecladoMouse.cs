@@ -16,9 +16,11 @@ public sealed class AdaptadorTecladoMouse : IEntradaDoPiloto
             "piloto_mover_direita",
             "piloto_mover_cima",
             "piloto_mover_baixo");
+        var impulsoFrontal = Input.GetActionStrength("piloto_acelerar") - Input.GetActionStrength("piloto_frear");
 
         return new EstadoEntradaPiloto(
             movimento,
+            impulsoFrontal,
             Input.IsActionPressed("piloto_acao_primaria"),
             Input.IsActionJustPressed("piloto_acao_primaria"),
             Input.IsActionJustPressed("piloto_confirmar"),

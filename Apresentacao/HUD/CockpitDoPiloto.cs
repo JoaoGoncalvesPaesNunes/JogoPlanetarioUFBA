@@ -136,13 +136,14 @@ public partial class CockpitDoPiloto : Control
         }
 
         var y = tamanho.Y * 0.835f;
-        DesenharBarra(new Vector2(tamanho.X * 0.1f, y), new Vector2(tamanho.X * 0.18f, 18f), _estadoDaNave.Energia / 100f, new Color(0.15f, 0.75f, 1f, 0.95f));
-        DesenharBarra(new Vector2(tamanho.X * 0.41f, y), new Vector2(tamanho.X * 0.18f, 18f), _controladorDeVoo.AlinhamentoDaRota, new Color(0.95f, 0.85f, 0.25f, 0.95f));
-        DesenharBarra(new Vector2(tamanho.X * 0.72f, y), new Vector2(tamanho.X * 0.18f, 18f), _estadoDaNave.CargaDeDobra / 100f, new Color(0.2f, 1f, 0.55f, 0.95f));
+        DesenharBarra(new Vector2(tamanho.X * 0.1f, y), new Vector2(tamanho.X * 0.16f, 18f), _estadoDaNave.Energia / 100f, new Color(0.15f, 0.75f, 1f, 0.95f));
+        DesenharBarra(new Vector2(tamanho.X * 0.31f, y), new Vector2(tamanho.X * 0.16f, 18f), _controladorDeVoo.VelocidadeFrontalAtual, new Color(0.95f, 0.95f, 0.35f, 0.95f));
+        DesenharBarra(new Vector2(tamanho.X * 0.52f, y), new Vector2(tamanho.X * 0.16f, 18f), _controladorDeVoo.AlinhamentoDaRota, new Color(0.95f, 0.65f, 0.25f, 0.95f));
+        DesenharBarra(new Vector2(tamanho.X * 0.73f, y), new Vector2(tamanho.X * 0.16f, 18f), _estadoDaNave.CargaDeDobra / 100f, new Color(0.2f, 1f, 0.55f, 0.95f));
 
         if (_controladorDoLoopCentral is not null)
         {
-            DesenharBarra(new Vector2(tamanho.X * 0.41f, y + 30f), new Vector2(tamanho.X * 0.18f, 14f), _controladorDoLoopCentral.ProgressoDoWaypoint / 100f, new Color(0.95f, 0.45f, 0.25f, 0.95f));
+            DesenharBarra(new Vector2(tamanho.X * 0.52f, y + 30f), new Vector2(tamanho.X * 0.16f, 14f), _controladorDoLoopCentral.ProgressoDoWaypoint / 100f, new Color(0.95f, 0.45f, 0.25f, 0.95f));
         }
     }
 
@@ -191,7 +192,7 @@ public partial class CockpitDoPiloto : Control
             var waypoint = _controladorDoLoopCentral?.NumeroDoWaypoint ?? 1;
             _textoStatus.Text =
                 $"WP {waypoint}  Aproximacao {progresso:0}%\n" +
-                $"Energia {_estadoDaNave.Energia:0}  Dobra {_estadoDaNave.CargaDeDobra:0}%";
+                $"Vel {_controladorDeVoo?.VelocidadeFrontalAtual * 100f:0}%  Dobra {_estadoDaNave.CargaDeDobra:0}%";
         }
     }
 }

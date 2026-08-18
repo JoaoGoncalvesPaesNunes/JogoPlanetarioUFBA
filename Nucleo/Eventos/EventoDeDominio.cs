@@ -12,6 +12,8 @@ public sealed record ObjetivoAlterado(string TextoDoObjetivo, DateTime MomentoUt
 
 public sealed record MovimentoDoPilotoAlterado(float X, float Y, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
+public sealed record VelocidadeDaNaveAlterada(float VelocidadeAtual, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
 public sealed record AcaoDoPilotoExecutada(string NomeDaAcao, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
 public sealed record EnergiaAlterada(float EnergiaAtual, string Motivo, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);

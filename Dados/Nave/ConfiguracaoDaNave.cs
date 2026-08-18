@@ -14,4 +14,8 @@ public partial class ConfiguracaoDaNave : Resource
     [Export] public float SensibilidadeDeMira { get; set; } = 1.8f;
     [Export] public float GanhoEstabilidadeAlinhado { get; set; } = 8f;
     [Export] public float PerdaEstabilidadeDesalinhado { get; set; } = 5f;
+    [Export] public float AceleracaoFrontal { get; set; } = 1.7f;
+    [Export] public float FreioFrontal { get; set; } = 2.4f;
+    [Export] public float ArrastoFrontal { get; set; } = 0.45f;
+    [Export] public float VelocidadeFrontalMaxima { get; set; } = 1f;
 }

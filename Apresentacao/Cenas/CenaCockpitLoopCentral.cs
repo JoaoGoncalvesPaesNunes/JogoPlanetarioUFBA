@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using ProjetoPlanetario.Apresentacao.HUD;
 using ProjetoPlanetario.Dados.Nave;
@@ -27,6 +28,7 @@ public partial class CenaCockpitLoopCentral : Node3D
         new(0.36f, 0.18f),
         new(-0.42f, -0.2f)
     };
+    private readonly List<Node3D> _objetosComParalaxe = new();
 
     private ControladorDeVoo? _controladorDeVoo;
     private ControladorDoLoopCentral? _controladorDoLoopCentral;
@@ -66,11 +68,16 @@ public partial class CenaCockpitLoopCentral : Node3D
             return;
         }
 
-        _controladorDoLoopCentral.AtualizarNavegacao(_controladorDeVoo.AlinhamentoDaRota, (float)delta);
+        var deltaFloat = (float)delta;
+        _controladorDoLoopCentral.AtualizarNavegacao(
+            _controladorDeVoo.AlinhamentoDaRota,
+            _controladorDeVoo.VelocidadeFrontalAtual,
+            deltaFloat);
+        AtualizarCenarioComImpulso(_controladorDeVoo.VelocidadeFrontalAtual, deltaFloat);
 
         if (_marcadorDeWaypoint is not null)
         {
-            _marcadorDeWaypoint.RotateZ((float)delta * 1.2f);
+            _marcadorDeWaypoint.RotateZ(deltaFloat * 1.2f);
             var pulso = 1f + Mathf.Sin(Time.GetTicksMsec() / 220.0f) * 0.08f;
             _marcadorDeWaypoint.Scale = Vector3.One * pulso;
         }
@@ -129,6 +136,7 @@ public partial class CenaCockpitLoopCentral : Node3D
             };
 
             AddChild(estrela);
+            _objetosComParalaxe.Add(estrela);
         }
     }
 
@@ -150,6 +158,7 @@ public partial class CenaCockpitLoopCentral : Node3D
             }
         };
         AddChild(planeta);
+        _objetosComParalaxe.Add(planeta);
 
         var materialAsteroide = new StandardMaterial3D
         {
@@ -172,6 +181,7 @@ public partial class CenaCockpitLoopCentral : Node3D
                 MaterialOverride = materialAsteroide
             };
             AddChild(asteroide);
+            _objetosComParalaxe.Add(asteroide);
         }
     }
 
@@ -293,6 +303,27 @@ public partial class CenaCockpitLoopCentral : Node3D
         _ultimoWaypointAplicado = _controladorDoLoopCentral.NumeroDoWaypoint;
         _controladorDeVoo.DefinirPontoDeDobra(ponto);
         _marcadorDeWaypoint.Position = new Vector3(ponto.X * 8f, -ponto.Y * 5f, -10f);
+    }
+
+    private void AtualizarCenarioComImpulso(float velocidadeFrontal, float delta)
+    {
+        if (velocidadeFrontal <= 0.01f)
+        {
+            return;
+        }
+
+        foreach (var objeto in _objetosComParalaxe)
+        {
+            objeto.Position += Vector3.Forward * velocidadeFrontal * delta * -7f;
+
+            if (objeto.Position.Z > 2f)
+            {
+                objeto.Position = new Vector3(
+                    GD.Randf() * 36f - 18f,
+                    GD.Randf() * 16f - 8f,
+                    -32f - GD.Randf() * 12f);
+            }
+        }
     }
 
     private static void RegistrarEventoImportante(EventoDeDominio eventoDeDominio)

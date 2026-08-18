@@ -8,8 +8,8 @@ Criar uma fatia jogavel pequena que demonstre a experiencia central: piloto em p
 
 1. A cena carrega o perfil `DesktopDev`.
 2. ORION apresenta o objetivo inicial.
-3. O piloto alinha o reticulo com o waypoint ativo.
-4. Manter o alinhamento aumenta o progresso de aproximacao.
+3. O piloto acelera para frente e alinha o reticulo com o waypoint ativo.
+4. Manter velocidade e alinhamento aumenta o progresso de aproximacao.
 5. Ao chegar a 100%, `WaypointAlcancado` inicia uma calibracao.
 6. A estacao virtual precisa pressionar `ACAO 1`.
 7. Depois, a estacao virtual pressiona `CONFIRMAR`.
@@ -20,7 +20,10 @@ Criar uma fatia jogavel pequena que demonstre a experiencia central: piloto em p
 
 ## Controles
 
-- Piloto: `WASD` ou setas para alinhar o reticulo.
+- Piloto: `W` para acelerar para frente.
+- Piloto: `S` para frear.
+- Piloto: `A`/`D` ou setas esquerda/direita para alinhar na horizontal.
+- Piloto: setas cima/baixo para alinhar na vertical.
 - Piloto: `Espaco` para estabilizar a dobra consumindo energia.
 - Passageiro: mouse nos botoes da estacao virtual.
 - Estacao: `ACAO 1` prepara suporte.
@@ -29,8 +32,8 @@ Criar uma fatia jogavel pequena que demonstre a experiencia central: piloto em p
 ## Arquitetura
 
 - `CenaCockpitLoopCentral` monta a cena principal.
-- `ControladorDeVoo` consome `IEntradaDoPiloto` e calcula alinhamento.
-- `ControladorDoLoopCentral` gerencia estado do loop e progresso dos dois waypoints.
+- `ControladorDeVoo` consome `IEntradaDoPiloto`, calcula alinhamento e velocidade frontal.
+- `ControladorDoLoopCentral` gerencia estado do loop e progresso dos dois waypoints. O progresso exige alinhamento e velocidade.
 - `EventoDeCalibracao` modela a interacao cooperativa `ACAO 1` + `CONFIRMAR`.
 - `EstadoDaNave` guarda energia, integridade, estabilidade e carga de dobra.
 - `DiretorNarrativo` reage a eventos e atualiza a fala de ORION/gatinho.
@@ -40,7 +43,7 @@ Criar uma fatia jogavel pequena que demonstre a experiencia central: piloto em p
 
 ## Placeholders
 
-O cockpit usa `Control`/`CanvasLayer` com retangulos, labels e barras. O espaco usa estrelas, asteroides e planeta em primitivas simples. Nao ha arte final, dublagem, efeitos de dobra finais ou projecao real de domo neste marco.
+O cockpit usa `Control`/`CanvasLayer` com retangulos, labels e barras. O espaco usa estrelas, asteroides e planeta em primitivas simples, com paralaxe para dar sensacao inicial de movimento para frente. Nao ha arte final, dublagem, efeitos de dobra finais ou projecao real de domo neste marco.
 
 ## Validacao
 

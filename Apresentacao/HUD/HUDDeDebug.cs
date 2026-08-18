@@ -74,6 +74,7 @@ public partial class HUDDeDebug : CanvasLayer
             EnergiaAlterada evento => $"Energia alterada: {evento.EnergiaAtual:0}",
             EstabilidadeDaDobraAlterada evento => $"Estabilidade: {evento.EstabilidadeAtual:0} ({evento.Motivo})",
             AlinhamentoDaRotaAlterado evento => $"Alinhamento: {evento.AlinhamentoAtual * 100f:0}%",
+            VelocidadeDaNaveAlterada evento => $"Velocidade: {evento.VelocidadeAtual * 100f:0}%",
             RotaSelecionada evento => $"Rota selecionada: {evento.NomeDaRota}",
             ObjetivoAlterado evento => $"Objetivo: {evento.TextoDoObjetivo}",
             ProgressoDoWaypointAlterado evento => $"WP {evento.NumeroDoWaypoint}: {evento.ProgressoAtual:0}%",

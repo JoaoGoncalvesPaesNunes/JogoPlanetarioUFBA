@@ -19,10 +19,12 @@ public partial class ControladorDeVoo : Node3D
     private Vector2 _ultimoMovimentoPublicado;
     private float _ultimoAlinhamentoPublicado = -1f;
     private float _ultimoEstabilidadePublicada = -1f;
+    private float _ultimaVelocidadePublicada = -1f;
 
     public Vector2 ApontamentoDoPiloto { get; private set; }
     public Vector2 PontoDeDobra { get; private set; } = new(0.36f, 0.18f);
     public float AlinhamentoDaRota { get; private set; }
+    public float VelocidadeFrontalAtual { get; private set; }
 
     public void Configurar(
         IEntradaDoPiloto entradaDoPiloto,
@@ -53,6 +55,8 @@ public partial class ControladorDeVoo : Node3D
         var estadoEntrada = _entradaDoPiloto.LerEstado();
         var movimento = estadoEntrada.Movimento;
         var deltaFloat = (float)delta;
+
+        AtualizarVelocidadeFrontal(estadoEntrada.ImpulsoFrontal, deltaFloat);
 
         ApontamentoDoPiloto += new Vector2(movimento.X, movimento.Y) * _configuracaoDaNave.SensibilidadeDeMira * deltaFloat;
         ApontamentoDoPiloto = LimitarComprimento(ApontamentoDoPiloto, 1f);
@@ -118,6 +122,35 @@ public partial class ControladorDeVoo : Node3D
         {
             _ultimoAlinhamentoPublicado = AlinhamentoDaRota;
             _barramentoDeEventos.Publicar(new AlinhamentoDaRotaAlterado(AlinhamentoDaRota, desvio.X, desvio.Y, DateTime.UtcNow));
+        }
+    }
+
+    private void AtualizarVelocidadeFrontal(float impulsoFrontal, float delta)
+    {
+        if (_barramentoDeEventos is null)
+        {
+            return;
+        }
+
+        if (impulsoFrontal > 0f)
+        {
+            VelocidadeFrontalAtual += impulsoFrontal * _configuracaoDaNave.AceleracaoFrontal * delta;
+        }
+        else if (impulsoFrontal < 0f)
+        {
+            VelocidadeFrontalAtual += impulsoFrontal * _configuracaoDaNave.FreioFrontal * delta;
+        }
+        else
+        {
+            VelocidadeFrontalAtual = Mathf.MoveToward(VelocidadeFrontalAtual, 0f, _configuracaoDaNave.ArrastoFrontal * delta);
+        }
+
+        VelocidadeFrontalAtual = Mathf.Clamp(VelocidadeFrontalAtual, 0f, _configuracaoDaNave.VelocidadeFrontalMaxima);
+
+        if (Math.Abs(VelocidadeFrontalAtual - _ultimaVelocidadePublicada) >= 0.08f)
+        {
+            _ultimaVelocidadePublicada = VelocidadeFrontalAtual;
+            _barramentoDeEventos.Publicar(new VelocidadeDaNaveAlterada(VelocidadeFrontalAtual, DateTime.UtcNow));
         }
     }
 

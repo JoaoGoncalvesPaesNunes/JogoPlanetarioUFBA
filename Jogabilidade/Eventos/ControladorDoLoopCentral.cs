@@ -46,15 +46,16 @@ public sealed class ControladorDoLoopCentral
         _barramentoDeEventos.Publicar(new CargaDeDobraAlterada(_estadoDaNave.CargaDeDobra, DateTime.UtcNow));
     }
 
-    public void AtualizarNavegacao(float alinhamentoDaRota, float delta)
+    public void AtualizarNavegacao(float alinhamentoDaRota, float velocidadeFrontal, float delta)
     {
         if (Estado != EstadoDoLoopCentral.Navegando)
         {
             return;
         }
 
-        var variacao = alinhamentoDaRota >= AlinhamentoMinimoParaAproximar
-            ? GanhoProgressoPorSegundo * delta
+        var velocidadeUtil = Math.Clamp(velocidadeFrontal, 0f, 1f);
+        var variacao = alinhamentoDaRota >= AlinhamentoMinimoParaAproximar && velocidadeUtil > 0.05f
+            ? GanhoProgressoPorSegundo * velocidadeUtil * delta
             : -PerdaProgressoPorSegundo * (1f - alinhamentoDaRota) * delta;
 
         ProgressoDoWaypoint = Math.Clamp(ProgressoDoWaypoint + variacao, 0f, 100f);

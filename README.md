@@ -24,7 +24,10 @@ Observacao: use a edicao .NET/C# da Godot. O build sem `mono` nao carrega script
 
 ## Controles do microprototipo
 
-- `WASD` ou setas: alinhar o reticulo da nave com o waypoint.
+- `W`: acelerar para frente.
+- `S`: frear.
+- `A`/`D` ou setas esquerda/direita: alinhar o reticulo na horizontal.
+- Setas cima/baixo: alinhar o reticulo na vertical.
 - Mantenha o reticulo alinhado ao waypoint para encher a barra de aproximacao.
 - Ao alcancar o waypoint, a cena passa a aguardar a estacao virtual.
 - Estacao virtual `ACAO 1`: iniciar suporte da tripulacao.
@@ -58,6 +61,7 @@ O build C#, os testes de dominio e a carga headless da cena foram validados com 
 - Porta de projecao desktop e stub documentado para planetario.
 - Diretor narrativo minimo para ORION e gatinho como texto.
 - Cenario temporario com estrelas, planeta, asteroides e marcador de dobra.
+- Sensacao inicial de avanco com velocidade frontal e paralaxe simples do cenario.
 
 ## Fora do escopo deste marco
 
