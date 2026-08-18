@@ -10,6 +10,7 @@ namespace ProjetoPlanetario.Apresentacao.HUD;
 public partial class HUDDeDebug : CanvasLayer
 {
     private readonly Queue<string> _eventosRecentes = new();
+    private string _ultimaAcao = "Aguardando entrada...";
     private Label? _texto;
     private EstadoDaNave? _estadoDaNave;
     private ConfiguracaoDeExecucao? _configuracaoDeExecucao;
@@ -35,6 +36,7 @@ public partial class HUDDeDebug : CanvasLayer
             Size = new Vector2(620, 260),
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
+        _texto.AddThemeFontSizeOverride("font_size", 18);
 
         AddChild(_texto);
     }
@@ -50,6 +52,7 @@ public partial class HUDDeDebug : CanvasLayer
             $"Perfil: {_configuracaoDeExecucao.Perfil}\n" +
             $"Energia: {_estadoDaNave.Energia:0}\n" +
             $"Integridade: {_estadoDaNave.Integridade:0}\n" +
+            $"Ultima acao: {_ultimaAcao}\n" +
             $"Narrativa: {_diretorNarrativo.UltimaLinha}\n\n" +
             "Eventos recentes:\n" +
             string.Join("\n", _eventosRecentes);
@@ -68,6 +71,7 @@ public partial class HUDDeDebug : CanvasLayer
             _ => eventoDeDominio.GetType().Name
         };
 
+        _ultimaAcao = linha;
         _eventosRecentes.Enqueue(linha);
 
         while (_eventosRecentes.Count > 7)
