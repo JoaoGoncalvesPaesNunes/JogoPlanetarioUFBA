@@ -21,6 +21,7 @@ public partial class CenaNavegacaoOnRails : Node3D
 {
     private const float VelocidadeProgressoPorSegundo = 0.085f;
     private const float DuracaoSalto = 2.35f;
+    private const string CaminhoPanoramaEspacial = "res://assets/espaco/space_spheremaps/hazy_nebulae_1.png";
 
     private readonly BarramentoDeEventos _barramentoDeEventos = new();
     private readonly EstadoDaNave _estadoDaNave = new();
@@ -48,7 +49,6 @@ public partial class CenaNavegacaoOnRails : Node3D
         _barramentoDeEventos.EventoPublicado += AoEventoPublicado;
 
         CriarIluminacao();
-        CriarCeuEstelar();
         CriarRota();
         CriarCenario();
         CriarCometa();
@@ -97,13 +97,28 @@ public partial class CenaNavegacaoOnRails : Node3D
 
     private void CriarIluminacao()
     {
+        var texturaPanorama = GD.Load<Texture2D>(CaminhoPanoramaEspacial);
+        if (texturaPanorama is null)
+        {
+            GD.PushError($"Nao foi possivel carregar o panorama espacial: {CaminhoPanoramaEspacial}");
+        }
+
         AddChild(new WorldEnvironment
         {
             Name = "AmbienteOnRails",
             Environment = new Godot.Environment
             {
-                BackgroundMode = Godot.Environment.BGMode.Color,
+                BackgroundMode = texturaPanorama is null ? Godot.Environment.BGMode.Color : Godot.Environment.BGMode.Sky,
                 BackgroundColor = new Color(0.003f, 0.005f, 0.012f),
+                Sky = texturaPanorama is null
+                    ? null
+                    : new Sky
+                    {
+                        SkyMaterial = new PanoramaSkyMaterial
+                        {
+                            Panorama = texturaPanorama
+                        }
+                    },
                 AmbientLightSource = Godot.Environment.AmbientSource.Color,
                 AmbientLightColor = new Color(0.035f, 0.055f, 0.09f),
                 AmbientLightEnergy = 0.35f
@@ -170,12 +185,6 @@ public partial class CenaNavegacaoOnRails : Node3D
         var cenario = CarregarCenaNode3D("res://Apresentacao/Cenas/CenarioEspacialMarco04.tscn", "CenarioEspacialMarco04");
         AddChild(cenario);
         RegistrarObjetosAnimaveis(cenario);
-    }
-
-    private void CriarCeuEstelar()
-    {
-        var ceu = CarregarCenaNode3D("res://Apresentacao/Cenas/CeuEstelarMarco05.tscn", "CeuEstelarMarco05");
-        AddChild(ceu);
     }
 
     private void CriarCometa()

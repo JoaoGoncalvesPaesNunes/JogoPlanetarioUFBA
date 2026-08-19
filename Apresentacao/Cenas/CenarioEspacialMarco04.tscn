@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/craft_speederA.glb" id="1_craft"]
 [ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/satelliteDish_large.glb" id="2_dish"]
@@ -32,22 +32,6 @@ height = 6.64
 radial_segments = 48
 rings = 24
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_estrelaAzul"]
-albedo_color = Color(0.54, 0.8, 1, 1)
-emission_enabled = true
-emission = Color(0.2, 0.55, 1, 1)
-emission_energy_multiplier = 1.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_estrelaDourada"]
-albedo_color = Color(1, 0.86, 0.58, 1)
-emission_enabled = true
-emission = Color(1, 0.58, 0.22, 1)
-emission_energy_multiplier = 1.35
-
-[sub_resource type="SphereMesh" id="SphereMesh_estrela"]
-radius = 0.035
-height = 0.07
-
 [node name="CenarioEspacialMarco04" type="Node3D"]
 
 [node name="PlanetaDistante" type="MeshInstance3D" parent="."]
@@ -80,25 +64,3 @@ transform = Transform3D(0.95, 0, 0, 0, 0.95, 0, 0, 0, 0.95, -7.5, -0.9, -27.5)
 
 [node name="AsteroideKenneyC" parent="CampoAsteroides" instance=ExtResource("3_rocka") groups=["cenario_animavel"]]
 transform = Transform3D(0.82, 0, 0, 0, 0.82, 0, 0, 0, 0.82, 7.8, 2.8, -37.5)
-
-[node name="EstrelasCompostas" type="Node3D" parent="."]
-
-[node name="EstrelaAzulA" type="MeshInstance3D" parent="EstrelasCompostas"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 7, -20)
-mesh = SubResource("SphereMesh_estrela")
-material_override = SubResource("StandardMaterial3D_estrelaAzul")
-
-[node name="EstrelaAzulB" type="MeshInstance3D" parent="EstrelasCompostas"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 11, -3, -28)
-mesh = SubResource("SphereMesh_estrela")
-material_override = SubResource("StandardMaterial3D_estrelaAzul")
-
-[node name="EstrelaDouradaA" type="MeshInstance3D" parent="EstrelasCompostas"]
-transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 15, 5, -42)
-mesh = SubResource("SphereMesh_estrela")
-material_override = SubResource("StandardMaterial3D_estrelaDourada")
-
-[node name="EstrelaDouradaB" type="MeshInstance3D" parent="EstrelasCompostas"]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -16, -5, -36)
-mesh = SubResource("SphereMesh_estrela")
-material_override = SubResource("StandardMaterial3D_estrelaDourada")

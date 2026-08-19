@@ -13,6 +13,7 @@ downloads_assets/
 # IDE
 .vs/
 .vscode/
+.codex/
 *.user
 *.suo
 
