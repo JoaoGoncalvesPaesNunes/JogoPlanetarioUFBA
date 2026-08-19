@@ -54,6 +54,7 @@ O build C#, os testes de dominio e a carga headless da cena foram validados com 
 - Avanco, re, parada e camera livre limitada.
 - Assets espaciais iniciais integrados de Kenney Space Kit e Quaternius Ultimate Spaceships.
 - Cometa visual com meteoros Kenney e cauda emissiva simples.
+- Ceu estelar procedural com skydome, estrelas profundas e faixa galactica sutil.
 - Marcadores narrativos por progresso fisico.
 - Flash/fade simples de salto gravitacional.
 - Loop central de dois waypoints preservado em `CenaCockpitLoopCentral`.

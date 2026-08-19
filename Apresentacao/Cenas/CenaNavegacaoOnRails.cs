@@ -48,6 +48,7 @@ public partial class CenaNavegacaoOnRails : Node3D
         _barramentoDeEventos.EventoPublicado += AoEventoPublicado;
 
         CriarIluminacao();
+        CriarCeuEstelar();
         CriarRota();
         CriarCenario();
         CriarCometa();
@@ -169,6 +170,12 @@ public partial class CenaNavegacaoOnRails : Node3D
         var cenario = CarregarCenaNode3D("res://Apresentacao/Cenas/CenarioEspacialMarco04.tscn", "CenarioEspacialMarco04");
         AddChild(cenario);
         RegistrarObjetosAnimaveis(cenario);
+    }
+
+    private void CriarCeuEstelar()
+    {
+        var ceu = CarregarCenaNode3D("res://Apresentacao/Cenas/CeuEstelarMarco05.tscn", "CeuEstelarMarco05");
+        AddChild(ceu);
     }
 
     private void CriarCometa()
