@@ -104,8 +104,8 @@ public partial class CenaNavegacaoOnRails : Node3D
                 BackgroundMode = Godot.Environment.BGMode.Color,
                 BackgroundColor = new Color(0.003f, 0.005f, 0.012f),
                 AmbientLightSource = Godot.Environment.AmbientSource.Color,
-                AmbientLightColor = new Color(0.08f, 0.1f, 0.14f),
-                AmbientLightEnergy = 0.5f
+                AmbientLightColor = new Color(0.035f, 0.055f, 0.09f),
+                AmbientLightEnergy = 0.35f
             }
         });
 
@@ -113,7 +113,17 @@ public partial class CenaNavegacaoOnRails : Node3D
         {
             Name = "LuzPrincipal",
             Rotation = new Vector3(-0.7f, -0.65f, 0.1f),
-            LightEnergy = 2.1f
+            LightColor = new Color(0.72f, 0.83f, 1f),
+            LightEnergy = 2.35f
+        });
+
+        AddChild(new OmniLight3D
+        {
+            Name = "LuzRimAzulCenario",
+            Position = new Vector3(5f, 3f, -18f),
+            LightColor = new Color(0.2f, 0.62f, 1f),
+            LightEnergy = 1.15f,
+            OmniRange = 22f
         });
     }
 
@@ -156,78 +166,39 @@ public partial class CenaNavegacaoOnRails : Node3D
 
     private void CriarCenario()
     {
-        var materialEstrela = new StandardMaterial3D
-        {
-            AlbedoColor = new Color(0.86f, 0.94f, 1f),
-            EmissionEnabled = true,
-            Emission = new Color(0.45f, 0.65f, 0.9f),
-            EmissionEnergyMultiplier = 0.7f
-        };
-
-        for (var indice = 0; indice < 140; indice++)
-        {
-            var estrela = new MeshInstance3D
-            {
-                Name = $"EstrelaOnRails{indice:000}",
-                Mesh = new SphereMesh { Radius = 0.018f + GD.Randf() * 0.018f, Height = 0.04f },
-                Position = new Vector3(GD.Randf() * 46f - 23f, GD.Randf() * 22f - 11f, -GD.Randf() * 46f - 4f),
-                MaterialOverride = materialEstrela
-            };
-            AddChild(estrela);
-            _objetosDeCenario.Add(estrela);
-        }
-
-        var planeta = new MeshInstance3D
-        {
-            Name = "PlanetaDistanteGraybox",
-            Position = new Vector3(-8f, 4f, -34f),
-            Mesh = new SphereMesh { Radius = 3.2f, Height = 6.4f },
-            MaterialOverride = new StandardMaterial3D
-            {
-                AlbedoColor = new Color(0.2f, 0.38f, 0.78f),
-                Roughness = 0.9f
-            }
-        };
-        AddChild(planeta);
+        var cenario = CarregarCenaNode3D("res://Apresentacao/Cenas/CenarioEspacialMarco04.tscn", "CenarioEspacialMarco04");
+        AddChild(cenario);
+        RegistrarObjetosAnimaveis(cenario);
     }
 
     private void CriarCometa()
     {
-        var nucleo = new MeshInstance3D
-        {
-            Name = "CometaPlaceholder",
-            Position = new Vector3(4.2f, 1.1f, -20f),
-            Scale = new Vector3(1.3f, 0.85f, 1f),
-            Mesh = new SphereMesh { Radius = 0.75f, Height = 1.5f },
-            MaterialOverride = new StandardMaterial3D
-            {
-                AlbedoColor = new Color(0.72f, 0.72f, 0.68f),
-                Roughness = 1f
-            }
-        };
-        AddChild(nucleo);
+        var cometa = CarregarCenaNode3D("res://Apresentacao/Cenas/CometaMarco04.tscn", "CometaMarco04");
+        AddChild(cometa);
+        RegistrarObjetosAnimaveis(cometa);
+    }
 
-        var cauda = new MeshInstance3D
+    private static Node3D CarregarCenaNode3D(string caminho, string nomeFallback)
+    {
+        var cena = GD.Load<PackedScene>(caminho);
+        if (cena is null)
         {
-            Name = "CaudaCometaPlaceholder",
-            Position = new Vector3(6.1f, 1.1f, -20.5f),
-            Rotation = new Vector3(0f, 0.2f, Mathf.Pi / 2f),
-            Mesh = new CylinderMesh
+            GD.PushError($"Nao foi possivel carregar a cena de asset: {caminho}");
+            return new Node3D { Name = nomeFallback };
+        }
+
+        return cena.Instantiate<Node3D>();
+    }
+
+    private void RegistrarObjetosAnimaveis(Node raiz)
+    {
+        foreach (var filho in raiz.FindChildren("*", "Node3D", true, false))
+        {
+            if (filho is Node3D objetoAnimavel && objetoAnimavel.IsInGroup("cenario_animavel"))
             {
-                TopRadius = 0.08f,
-                BottomRadius = 0.72f,
-                Height = 4.2f
-            },
-            MaterialOverride = new StandardMaterial3D
-            {
-                AlbedoColor = new Color(0.55f, 0.88f, 1f, 0.46f),
-                Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
-                EmissionEnabled = true,
-                Emission = new Color(0.25f, 0.7f, 1f),
-                EmissionEnergyMultiplier = 0.65f
+                _objetosDeCenario.Add(objetoAnimavel);
             }
-        };
-        AddChild(cauda);
+        }
     }
 
     private void CriarCockpitVisual(DiretorNarrativo diretorNarrativo)

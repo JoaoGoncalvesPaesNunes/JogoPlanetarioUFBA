@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/meteor_detailed.glb" id="1_meteor"]
+[ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/meteor_half.glb" id="2_half"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cauda"]
+transparency = 1
+albedo_color = Color(0.34, 0.78, 1, 0.36)
+emission_enabled = true
+emission = Color(0.16, 0.62, 1, 1)
+emission_energy_multiplier = 1.45
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cauda"]
+material = SubResource("StandardMaterial3D_cauda")
+top_radius = 0.05
+bottom_radius = 0.7
+height = 4.6
+radial_segments = 24
+
+[node name="CometaMarco04" type="Node3D"]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 4.2, 1.1, -20)
+
+[node name="NucleoCometaKenney" parent="." instance=ExtResource("1_meteor") groups=["cenario_animavel"]]
+transform = Transform3D(1.25, 0, 0, 0, 0.82, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="FragmentoCometaKenneyA" parent="." instance=ExtResource("2_half") groups=["cenario_animavel"]]
+transform = Transform3D(0.38, 0, 0, 0, 0.38, 0, 0, 0, 0.38, -0.9, 0.28, 0.35)
+
+[node name="FragmentoCometaKenneyB" parent="." instance=ExtResource("2_half") groups=["cenario_animavel"]]
+transform = Transform3D(0.24, 0, 0, 0, 0.24, 0, 0, 0, 0.24, -1.35, -0.22, -0.18)
+
+[node name="CaudaCometaEnergetica" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 1.45, 0, -0.2)
+mesh = SubResource("CylinderMesh_cauda")
+
+[node name="LuzAzulCometa" type="OmniLight3D" parent="."]
+light_color = Color(0.36, 0.78, 1, 1)
+light_energy = 0.9
+omni_range = 7

@@ -52,7 +52,8 @@ O build C#, os testes de dominio e a carga headless da cena foram validados com 
 - Camera de primeira pessoa e cockpit graybox.
 - Navegacao on-rails com `Path3D`/`PathFollow3D`.
 - Avanco, re, parada e camera livre limitada.
-- Cometa 3D placeholder proximo da rota.
+- Assets espaciais iniciais integrados de Kenney Space Kit e Quaternius Ultimate Spaceships.
+- Cometa visual com meteoros Kenney e cauda emissiva simples.
 - Marcadores narrativos por progresso fisico.
 - Flash/fade simples de salto gravitacional.
 - Loop central de dois waypoints preservado em `CenaCockpitLoopCentral`.
@@ -62,7 +63,7 @@ O build C#, os testes de dominio e a carga headless da cena foram validados com 
 - Estacao virtual clicavel para simular uma futura estacao arcade.
 - Porta de projecao desktop e stub documentado para planetario.
 - Diretor narrativo minimo para ORION e gatinho como texto.
-- Cenario temporario com estrelas, planeta, asteroides e marcador de dobra.
+- Cenario inicial com subcenas de assets espaciais, planeta estilizado, asteroides, nave distante e antena de pesquisa.
 - Sensacao inicial de avanco com velocidade frontal e paralaxe simples do cenario.
 
 ## Fora do escopo deste marco

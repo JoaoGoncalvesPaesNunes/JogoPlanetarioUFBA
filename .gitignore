@@ -8,6 +8,7 @@ export_presets.cfg
 bin/
 obj/
 .mono/
+downloads_assets/
 
 # IDE
 .vs/
