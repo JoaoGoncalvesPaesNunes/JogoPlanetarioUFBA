@@ -19,10 +19,15 @@ public partial class EstacaoVirtual : Control
         AnchorRight = 1f;
         OffsetLeft = -360f;
         OffsetRight = -24f;
-        OffsetTop = 24f;
-        OffsetBottom = 340f;
+        OffsetTop = 112f;
+        OffsetBottom = 328f;
 
         var painel = new PanelContainer();
+        painel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+        {
+            BgColor = new Color("172623"), ContentMarginLeft = 10, ContentMarginRight = 10,
+            ContentMarginTop = 10, ContentMarginBottom = 10
+        });
         painel.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(painel);
 
@@ -51,7 +56,8 @@ public partial class EstacaoVirtual : Control
         var botao = new Button
         {
             Text = texto,
-            CustomMinimumSize = new Vector2(104, 48)
+            CustomMinimumSize = new Vector2(96, 44),
+            FocusMode = FocusModeEnum.None
         };
 
         botao.Pressed += () => _entradaDeEstacao?.EnviarAcao(acao);
@@ -62,7 +68,7 @@ public partial class EstacaoVirtual : Control
     {
         grade.AddChild(new Control
         {
-            CustomMinimumSize = new Vector2(104, 48)
+            CustomMinimumSize = new Vector2(96, 44)
         });
     }
 }

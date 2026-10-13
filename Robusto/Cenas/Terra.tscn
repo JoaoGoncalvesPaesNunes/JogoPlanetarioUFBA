@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Robusto/Cenarios/CenarioDaViagem.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Apresentacao/Cenarios/AmbienteDestino.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/robusto/2k_earth_daymap.jpg" id="3"]
+
+
+
+[sub_resource type="StandardMaterial3D" id="MaterialPlaneta"]
+albedo_texture = ExtResource("3")
+roughness = 0.95
+
+[sub_resource type="SphereMesh" id="Esfera"]
+radius = 85.0
+height = 170.0
+radial_segments = 96
+rings = 48
+material = SubResource("MaterialPlaneta")
+
+[sub_resource type="Curve3D" id="Curva"]
+bake_interval = 0.2
+_data = {
+"points": PackedVector3Array(0, 0, 8, 0, 0, -8, 0, 0, 0, -1, 0, 12, 1, 0, -12, 2, 0.5, -35, 1, 0, 12, -1, 0, -12, -1, 1, -75, 0, 0, 8, 0, 0, -8, 0, 1, -120),
+"tilts": PackedFloat32Array(0, 0, 0, 0)
+}
+point_count = 4
+
+
+[node name="Terra" type="Node3D"]
+script = ExtResource("1")
+Identificador = "terra"
+NomeExibicao = "Terra"
+
+
+[node name="Mundo" type="Node3D" parent="."]
+[node name="CorposCelestes" type="Node3D" parent="Mundo"]
+[node name="Planeta" type="Node3D" parent="Mundo/CorposCelestes"]
+position = Vector3(20, 42, -300)
+
+[node name="Superficie" type="MeshInstance3D" parent="Mundo/CorposCelestes/Planeta"]
+rotation_degrees = Vector3(0, 135, 0)
+mesh = SubResource("Esfera")
+[node name="Geometria" type="Node3D" parent="Mundo"]
+[node name="Objetos" type="Node3D" parent="Mundo"]
+[node name="EfeitosVisuais" type="Node3D" parent="Mundo"]
+[node name="Jogabilidade" type="Node3D" parent="."]
+[node name="Eventos" type="Node3D" parent="Jogabilidade"]
+[node name="Gatilhos" type="Node3D" parent="Jogabilidade"]
+[node name="PontosDeAparecimento" type="Node3D" parent="Jogabilidade"]
+[node name="Iluminacao" type="Node3D" parent="."]
+[node name="AmbienteDestino" parent="Iluminacao" instance=ExtResource("2")]
+[node name="Audio" type="Node3D" parent="."]
+[node name="AlvosDeCamera" type="Node3D" parent="."]
+[node name="CentroDoPlaneta" type="Marker3D" parent="Mundo/CorposCelestes/Planeta"]
+[node name="Debug" type="Node3D" parent="."]
+visible = false
+[node name="Rota" type="Path3D" parent="."]
+curve = SubResource("Curva")

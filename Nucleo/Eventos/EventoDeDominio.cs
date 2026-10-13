@@ -56,6 +56,8 @@ public sealed record SaltoGravitacionalIniciado(DateTime MomentoUtc) : EventoDeD
 
 public sealed record SaltoGravitacionalConcluido(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
+public sealed record FaseDoSaltoAlterada(string Fase, string Destino, DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
+
 public sealed record SegmentoDeViagemConcluido(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);
 
 public sealed record SegmentoDeViagemReiniciado(DateTime MomentoUtc) : EventoDeDominio(MomentoUtc);

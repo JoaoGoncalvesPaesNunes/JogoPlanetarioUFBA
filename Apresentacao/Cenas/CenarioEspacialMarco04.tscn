@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/craft_speederA.glb" id="1_craft"]
 [ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/satelliteDish_large.glb" id="2_dish"]
@@ -7,40 +7,7 @@
 [ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/rock_crystalsLargeA.glb" id="5_crystal"]
 [ext_resource type="PackedScene" path="res://assets/espaco/quaternius/ultimate_spaceships/modelos/Spitfire.gltf" id="6_spitfire"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_planeta"]
-albedo_color = Color(0.11, 0.24, 0.5, 1)
-roughness = 0.92
-
-[sub_resource type="SphereMesh" id="SphereMesh_planeta"]
-material = SubResource("StandardMaterial3D_planeta")
-radius = 3.2
-height = 6.4
-radial_segments = 48
-rings = 24
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aura"]
-transparency = 1
-albedo_color = Color(0.16, 0.55, 0.95, 0.18)
-emission_enabled = true
-emission = Color(0.12, 0.45, 0.9, 1)
-emission_energy_multiplier = 0.55
-
-[sub_resource type="SphereMesh" id="SphereMesh_aura"]
-material = SubResource("StandardMaterial3D_aura")
-radius = 3.32
-height = 6.64
-radial_segments = 48
-rings = 24
-
 [node name="CenarioEspacialMarco04" type="Node3D"]
-
-[node name="PlanetaDistante" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4, -34)
-mesh = SubResource("SphereMesh_planeta")
-
-[node name="AuraPlanetaDistante" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.03, 0, 0, 0, 1.03, 0, 0, 0, 1.03, -8, 4, -34)
-mesh = SubResource("SphereMesh_aura")
 
 [node name="NavePatrulhaKenney" parent="." instance=ExtResource("1_craft") groups=["cenario_animavel"]]
 transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, -2.6, -0.6, -9.5)

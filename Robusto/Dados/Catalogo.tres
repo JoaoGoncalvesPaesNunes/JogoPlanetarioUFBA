@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CatalogoCenarios" load_steps=2 format=3]
+[ext_resource type="Script" path="res://Dados/Cenarios/CatalogoCenarios.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Caminhos = Dictionary[String, String]({
+"terra": "res://Robusto/Cenas/Terra.tscn",
+"marte": "res://Robusto/Cenas/Marte.tscn",
+"urano": "res://Robusto/Cenas/Urano.tscn",
+"ana_branca": "res://Robusto/Cenas/AnaBranca.tscn",
+"chegada": "res://Robusto/Cenas/Chegada.tscn"
+})

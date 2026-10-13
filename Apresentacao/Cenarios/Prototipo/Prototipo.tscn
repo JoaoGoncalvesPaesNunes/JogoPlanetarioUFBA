@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Apresentacao/Cenarios/CenarioPrototipo.cs" id="1"]
+
+[ext_resource type="PackedScene" path="res://Apresentacao/Cenas/CenarioEspacialMarco04.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://Apresentacao/Cenas/CometaMarco04.tscn" id="3"]
+[ext_resource type="Script" path="res://Apresentacao/Cenas/SistemaPlanetario.cs" id="4"]
+
+[node name="Prototipo" type="Node3D"]
+script = ExtResource("1")
+Identificador = "prototipo"
+NomeExibicao = "Trecho de teste preservado"
+IndiceDeEtapa = -1
+ProximosCenarios = PackedStringArray()
+
+[node name="Mundo" type="Node3D" parent="."]
+
+[node name="CorposCelestes" type="Node3D" parent="Mundo"]
+
+[node name="Geometria" type="Node3D" parent="Mundo"]
+
+[node name="Objetos" type="Node3D" parent="Mundo"]
+
+[node name="EfeitosVisuais" type="Node3D" parent="Mundo"]
+
+[node name="Jogabilidade" type="Node3D" parent="."]
+
+[node name="Eventos" type="Node3D" parent="Jogabilidade"]
+
+[node name="Gatilhos" type="Node3D" parent="Jogabilidade"]
+
+[node name="PontosDeAparecimento" type="Node3D" parent="Jogabilidade"]
+
+[node name="Iluminacao" type="Node3D" parent="."]
+
+[node name="Audio" type="Node3D" parent="."]
+
+[node name="AlvosDeCamera" type="Node3D" parent="."]
+
+[node name="Debug" type="Node3D" parent="."]
+visible = false
+
+[node name="SistemaPlanetario" type="Node3D" parent="Mundo/CorposCelestes"]
+script = ExtResource("4")
+
+[node name="CenarioEspacialMarco04" parent="Mundo/Objetos" instance=ExtResource("2")]
+
+[node name="CometaMarco04" parent="Mundo/EfeitosVisuais" instance=ExtResource("3")]

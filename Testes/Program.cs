@@ -6,6 +6,7 @@ using ProjetoPlanetario.Jogabilidade.Viagem;
 using ProjetoPlanetario.Nucleo.Estado;
 using ProjetoPlanetario.Nucleo.Eventos;
 
+TestesRobustos.Executar();
 var estadoDaNave = new EstadoDaNave();
 Garantir(estadoDaNave.Energia == 100f, "Energia inicial deve ser 100.");
 Garantir(estadoDaNave.ConsumirEnergia(10f), "Consumo de energia positivo deve alterar estado.");
@@ -86,7 +87,45 @@ segmento.Iniciar();
 var resultadoRearmado = segmento.Atualizar(0.2f, 2.8f);
 Garantir(resultadoRearmado.MarcadoresDisparados.Any(marcador => marcador.Tipo == TipoMarcadorDeRota.AproximacaoCometa), "Reinicio deve rearmar marcadores.");
 
-Console.WriteLine("Testes de dominio concluidos com sucesso.");
+var salto = new ControladorDoSalto();
+Garantir(!salto.EscolherDestino("marte"), "Nao deve aceitar destino antes do ponto de salto.");
+salto.SolicitarDestino();
+salto.Atualizar(100);
+Garantir(salto.Fase == FaseDoSalto.AguardandoDestino, "Sem escolha nao ha salto automatico.");
+Garantir(!salto.EscolherDestino("saturno"), "Somente Marte e Jupiter sao aceitos.");
+Garantir(salto.EscolherDestino("marte"), "Escolha valida inicia preparacao.");
+Garantir(!salto.EscolherDestino("jupiter") && salto.DestinoSelecionado == "marte", "Destino bloqueado durante o salto.");
+salto.ConfirmarCarregamento(true);
+Garantir(!salto.DestinoCarregado, "Carga nao pode ser confirmada antes do hiperespaço.");
+salto.Atualizar(1);
+Garantir(salto.Fase == FaseDoSalto.Acelerando && salto.Intensidade == 0, "Aceleracao inicia suave.");
+salto.Atualizar(0.6f);
+Garantir(Math.Abs(salto.Intensidade - 0.5f) < 0.01f, "Intensidade cresce gradualmente.");
+salto.Atualizar(0.6f);
+Garantir(salto.Fase == FaseDoSalto.Hiperespaco && !salto.PrecisaCarregar, "Tunel precisa ser apresentado antes da troca.");
+salto.Atualizar(20);
+Garantir(salto.Fase == FaseDoSalto.Hiperespaco && salto.PrecisaCarregar, "Carga lenta mantem o hiperespaço.");
+salto.ConfirmarCarregamento(true);
+Garantir(!salto.PrecisaCarregar, "Carga ocorre uma vez.");
+salto.Atualizar(0.01f);
+Garantir(salto.Fase == FaseDoSalto.Desacelerando, "Desacelera somente com o destino pronto.");
+salto.Atualizar(1.2f);
+Garantir(salto.Fase == FaseDoSalto.Chegada && salto.Intensidade == 0, "Chegada remove o efeito.");
+salto.Reiniciar();
+Garantir(salto.DestinoSelecionado == "" && !salto.DestinoCarregado, "Reinicio limpa destino e carga.");
+salto.SolicitarDestino();
+salto.EscolherDestino("jupiter");
+salto.Atualizar(1);
+salto.Atualizar(1.2f);
+salto.Atualizar(0.2f);
+salto.ConfirmarCarregamento(false);
+Garantir(salto.Fase == FaseDoSalto.Falha && salto.AceitaEscolha, "Falha permite nova tentativa.");
+Garantir(salto.EscolherDestino("marte"), "Outra escolha recupera falha.");
+salto.Atualizar(float.NaN);
+salto.Atualizar(-1);
+Garantir(salto.TempoNaFase == 0, "Deltas invalidos nao corrompem o estado.");
+
+Console.WriteLine("Testes de dominio e salto concluidos com sucesso.");
 
 static void Garantir(bool condicao, string mensagem)
 {

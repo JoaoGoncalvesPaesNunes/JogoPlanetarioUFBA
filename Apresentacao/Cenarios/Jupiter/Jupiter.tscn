@@ -1,0 +1,62 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Apresentacao/Cenarios/CenarioBase.cs" id="1"]
+
+[ext_resource type="PackedScene" path="res://Apresentacao/Cenarios/AmbienteDestino.tscn" id="2"]
+[ext_resource type="Shader" path="res://Apresentacao/Shaders/Planeta.gdshader" id="3"]
+
+[sub_resource type="ShaderMaterial" id="Material"]
+shader = ExtResource("3")
+shader_parameter/gasoso = true
+
+[sub_resource type="SphereMesh" id="Planeta"]
+radius = 22.0
+height = 44.0
+radial_segments = 96
+rings = 64
+material = SubResource("Material")
+
+[node name="Jupiter" type="Node3D"]
+script = ExtResource("1")
+Identificador = "jupiter"
+NomeExibicao = "Jupiter"
+IndiceDeEtapa = 1
+ProximosCenarios = PackedStringArray("saturno", "urano")
+
+[node name="Mundo" type="Node3D" parent="."]
+
+[node name="CorposCelestes" type="Node3D" parent="Mundo"]
+
+[node name="Geometria" type="Node3D" parent="Mundo"]
+
+[node name="Objetos" type="Node3D" parent="Mundo"]
+
+[node name="EfeitosVisuais" type="Node3D" parent="Mundo"]
+
+[node name="Jogabilidade" type="Node3D" parent="."]
+
+[node name="Eventos" type="Node3D" parent="Jogabilidade"]
+
+[node name="Gatilhos" type="Node3D" parent="Jogabilidade"]
+
+[node name="PontosDeAparecimento" type="Node3D" parent="Jogabilidade"]
+
+[node name="Iluminacao" type="Node3D" parent="."]
+
+[node name="Audio" type="Node3D" parent="."]
+
+[node name="AlvosDeCamera" type="Node3D" parent="."]
+
+[node name="Debug" type="Node3D" parent="."]
+visible = false
+
+
+[node name="JupiterPlaceholder" type="MeshInstance3D" parent="Mundo/CorposCelestes"]
+position = Vector3(0, 7, -115)
+mesh = SubResource("Planeta")
+metadata/placeholder = true
+
+[node name="AmbienteDestino" parent="Iluminacao" instance=ExtResource("2")]
+
+[node name="CentroDoPlaneta" type="Marker3D" parent="AlvosDeCamera"]
+position = Vector3(0, 7, -115)

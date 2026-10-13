@@ -20,3 +20,18 @@ downloads_assets/
 # OS
 Thumbs.db
 Desktop.ini
+
+# Saidas locais de exportacao e testes
+/builds/
+/exports/
+TestResults/
+*.log
+.DS_Store
+
+# Segredos locais (exemplos sem credenciais podem ser versionados)
+.env
+.env.*
+!.env.example
+/.aws/
+/.ssh/
+/.azure/

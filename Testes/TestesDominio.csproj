@@ -6,6 +6,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Robusto\Dominio\*.cs" Link="Robusto\Dominio\%(Filename)%(Extension)" />
+    <Compile Remove="Integracao\**\*.cs" />
+    <Compile Include="..\Jogabilidade\Viagem\ControladorDoSalto.cs" Link="Jogabilidade\Viagem\ControladorDoSalto.cs" />
     <Compile Include="..\Entrada\Modelos\AcaoLogicaDaEstacao.cs" Link="Entrada\Modelos\AcaoLogicaDaEstacao.cs" />
     <Compile Include="..\Jogabilidade\Eventos\ControladorDoLoopCentral.cs" Link="Jogabilidade\Eventos\ControladorDoLoopCentral.cs" />
     <Compile Include="..\Jogabilidade\Eventos\EstadoDoLoopCentral.cs" Link="Jogabilidade\Eventos\EstadoDoLoopCentral.cs" />

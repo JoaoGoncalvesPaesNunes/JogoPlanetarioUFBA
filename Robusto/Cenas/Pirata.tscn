@@ -1,0 +1,5 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://assets/espaco/kenney/space_kit/modelos/craft_speederA.glb" id="1"]
+[node name="Pirata" type="Node3D"]
+[node name="Modelo" parent="." instance=ExtResource("1")]
+position = Vector3(-2, -0.15, -1.5)
