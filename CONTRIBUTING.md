@@ -1,6 +1,7 @@
 # Contribuindo
 
-Este repositorio esta em fase de fundacao.
+Esta branch contem a versao robusta. Leia README.md e
+docs/DEVELOPMENT_GUIDE.md antes de alterar cenas ou sistemas.
 
 ## Padroes
 
@@ -19,4 +20,5 @@ dotnet build .\JogoPlanetarioUFBA.csproj
 dotnet run --project .\Testes\TestesDominio.csproj
 ```
 
-Quando possivel, tambem abra a cena principal na Godot e verifique o microprototipo.
+Tambem execute os testes de integracao indicados no guia e confira a cena
+Robusto/Cenas/Experiencia.tscn. Nao envie caches, builds ou segredos.

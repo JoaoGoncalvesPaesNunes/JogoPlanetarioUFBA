@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using ProjetoPlanetario.Jogabilidade.Eventos;
 using ProjetoPlanetario.Jogabilidade.Voo;
@@ -7,224 +8,195 @@ using ProjetoPlanetario.Nucleo.Eventos;
 
 namespace ProjetoPlanetario.Apresentacao.HUD;
 
-/// <summary>
-/// Camada visual temporaria do cockpit. Desenha formas simples para validar leitura e composicao.
-/// </summary>
 public partial class CockpitDoPiloto : Control
 {
-    private ControladorDeVoo? _controladorDeVoo;
-    private ControladorDoLoopCentral? _controladorDoLoopCentral;
-    private DiretorNarrativo? _diretorNarrativo;
-    private EstadoDaNave? _estadoDaNave;
-    private float _pulso;
-    private string _rotaAtual = "Ponto de dobra";
-    private string _objetivoAtual = "Avance pela rota de teste.";
-    private float _progressoNaRota;
-    private Label? _textoObjetivo;
-    private Label? _textoOrion;
-    private Label? _textoStatus;
+	public event Action? EstacaoSolicitada;
+	public event Action<string>? DestinoSolicitado;
+	private PanelContainer _escolha = null!;
+	private Label _tituloEscolha = null!;
+	private ControladorDeVoo? _voo;
+	private EstadoDaNave? _nave;
+	private ControladorDoLoopCentral? _loop;
+	private DiretorNarrativo? _orion;
+	private BarramentoDeEventos? _eventos;
+	private Label _objetivo = null!;
+	private Label _narrativa = null!;
+	private Label _destino = null!;
+	private Button _estacao = null!;
+	private Button _reiniciar = null!;
+	private readonly Label[] _instrumentos = new Label[4];
+	private float _progresso;
+	private string _textoObjetivo = "Avance pela rota de teste.";
+	private string _rota = "SETOR 01 / TRAVESSIA";
+	private bool _concluido;
+	private readonly Color _verde = new("80dfc9");
+	private readonly Color _ambar = new("eac082");
 
-    public void Configurar(
-        ControladorDeVoo controladorDeVoo,
-        EstadoDaNave estadoDaNave,
-        ControladorDoLoopCentral? controladorDoLoopCentral = null,
-        DiretorNarrativo? diretorNarrativo = null,
-        BarramentoDeEventos? barramentoDeEventos = null)
-    {
-        _controladorDeVoo = controladorDeVoo;
-        _estadoDaNave = estadoDaNave;
-        _controladorDoLoopCentral = controladorDoLoopCentral;
-        _diretorNarrativo = diretorNarrativo;
+	public void Configurar(ControladorDeVoo controladorDeVoo, EstadoDaNave estadoDaNave,
+		ControladorDoLoopCentral? controladorDoLoopCentral = null, DiretorNarrativo? diretorNarrativo = null,
+		BarramentoDeEventos? barramentoDeEventos = null)
+	{
+		_voo = controladorDeVoo;
+		_nave = estadoDaNave;
+		_loop = controladorDoLoopCentral;
+		_orion = diretorNarrativo;
+		_eventos = barramentoDeEventos;
+		if (_eventos is not null) _eventos.EventoPublicado += AoEvento;
+	}
 
-        if (barramentoDeEventos is not null)
-        {
-            barramentoDeEventos.EventoPublicado += AoEventoPublicado;
-        }
-    }
+	public void DefinirRotaAtual(string rotaAtual) => _rota = rotaAtual;
 
-    public void DefinirRotaAtual(string rotaAtual)
-    {
-        _rotaAtual = rotaAtual;
-    }
+	public override void _Ready()
+	{
+		SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+		MouseFilter = MouseFilterEnum.Ignore;
+		_destino = Texto(14, _verde);
+		_objetivo = Texto(20, new Color("eff3ef"));
+		_narrativa = Texto(15, new Color("c2ceca"));
+		for (var indice = 0; indice < _instrumentos.Length; indice++)
+			_instrumentos[indice] = Texto(16, indice == 1 ? _ambar : _verde);
+		_estacao = Botao("ESTACAO", "Abrir ou fechar estacao de passageiro (Tab)");
+		_estacao.Pressed += () => EstacaoSolicitada?.Invoke();
+		_reiniciar = Botao("VOLTAR A ROTA INICIAL", "Voltar ao inicio e escolher outro destino (Enter)");
+		_reiniciar.Name = "VoltarRotaInicial";
+		_reiniciar.Visible = false;
+		CriarEscolhaDestino();
+		_reiniciar.Pressed += () => _eventos?.Publicar(new EstacaoAcaoExecutada("Estacao1", "Confirmar", DateTime.UtcNow));
+		Resized += Organizar;
+		Organizar();
+	}
 
-    public override void _Ready()
-    {
-        SetAnchorsPreset(LayoutPreset.FullRect);
-        MouseFilter = MouseFilterEnum.Ignore;
+	private void CriarEscolhaDestino()
+	{
+		_escolha = new PanelContainer { Name = "EscolhaDestino", Visible = false };
+		_escolha.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+		{
+			BgColor = new Color("10221f"), ContentMarginLeft = 24, ContentMarginRight = 24,
+			ContentMarginTop = 20, ContentMarginBottom = 20, BorderWidthTop = 2, BorderColor = _verde
+		});
+		AddChild(_escolha);
+		var coluna = new VBoxContainer();
+		coluna.AddThemeConstantOverride("separation", 16);
+		_escolha.AddChild(coluna);
+		_tituloEscolha = new Label { Text = "ESCOLHA O DESTINO", HorizontalAlignment = HorizontalAlignment.Center };
+		coluna.AddChild(_tituloEscolha);
+		var opcoes = new HBoxContainer();
+		opcoes.AddThemeConstantOverride("separation", 12);
+		coluna.AddChild(opcoes);
+		foreach (var id in new[] { "marte", "jupiter" })
+		{
+			var botao = Botao(id.ToUpperInvariant(), id == "marte" ? "Confirmar Marte (1 / Acao 1)" : "Confirmar Jupiter (2 / Acao 2)");
+			botao.Name = id;
+			botao.Reparent(opcoes);
+			botao.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			botao.CustomMinimumSize = new Vector2(160, 48);
+			botao.Pressed += () => DestinoSolicitado?.Invoke(id);
+		}
+	}
 
-        _textoObjetivo = CriarLabel(new Vector2(170, 52), new Vector2(520, 64), 18);
-        _textoOrion = CriarLabel(new Vector2(170, 600), new Vector2(720, 72), 17);
-        _textoStatus = CriarLabel(new Vector2(900, 600), new Vector2(260, 72), 16);
-    }
+	public void MostrarEscolhaDestino(bool visivel, string titulo = "ESCOLHA O DESTINO")
+	{
+		_tituloEscolha.Text = titulo;
+		_escolha.Visible = visivel;
+	}
 
-    public override void _Process(double delta)
-    {
-        _pulso += (float)delta;
-        AtualizarTextos();
-        QueueRedraw();
-    }
+	public override void _ExitTree()
+	{
+		if (_eventos is not null) _eventos.EventoPublicado -= AoEvento;
+	}
 
-    public override void _Draw()
-    {
-        if (_controladorDeVoo is null || _estadoDaNave is null)
-        {
-            return;
-        }
+	public override void _Process(double delta)
+	{
+		if (_voo is null || _nave is null) return;
+		_destino.Text = $"UFBA / ORION     {_rota}";
+		_objetivo.Text = _loop?.ObjetivoAtual ?? _textoObjetivo;
+		_narrativa.Text = _orion?.UltimaLinha ?? "ORION: Sistemas nominais.";
+		_instrumentos[0].Text = $"ENERGIA\n{_nave.Energia:0}%";
+		_instrumentos[1].Text = $"PROPULSAO\n{_voo.VelocidadeFrontalAtual * 100f:+0;-0;0}%";
+		_instrumentos[2].Text = $"CASCO\n{_nave.Integridade:0}%";
+		_instrumentos[3].Text = $"TRAVESSIA\n{_progresso * 100f:0}%";
+		_reiniciar.Visible = _concluido;
+		QueueRedraw();
+	}
 
-        var tamanho = Size;
-        var centro = tamanho * 0.5f;
-        var margemLateral = tamanho.X * 0.11f;
-        var topoJanela = tamanho.Y * 0.08f;
-        var baseJanela = tamanho.Y * 0.78f;
+	private void Organizar()
+	{
+		if (_objetivo is null) return;
+		_destino.Position = new(28, 20);
+		_destino.Size = new(Mathf.Max(200, Size.X - 235), 22);
+		_objetivo.Position = new(28, 49);
+		_objetivo.Size = new(Mathf.Max(200, Size.X - 235), 60);
+		_estacao.Position = new(Size.X - 155, 22);
+		_estacao.Size = new(127, 36);
+		_escolha.Position = new(Size.X * 0.5f - 232, Size.Y * 0.42f - 60);
+		_escolha.Size = new(464, 134);
+		_reiniciar.Position = new(Size.X - 292, Size.Y - 202);
+		_reiniciar.Size = new(264, 42);
+		_narrativa.Position = new(28, Size.Y - 139);
+		_narrativa.Size = new(Size.X - 56, 45);
+		var largura = (Size.X - 56) / 4f;
+		for (var indice = 0; indice < _instrumentos.Length; indice++)
+		{
+			_instrumentos[indice].Position = new(28 + largura * indice, Size.Y - 82);
+			_instrumentos[indice].Size = new(largura - 18, 51);
+		}
+	}
 
-        DesenharJanela(tamanho, margemLateral, topoJanela, baseJanela);
-        DesenharMarcadoresDeRota(centro, tamanho);
-        DesenharPainelInferior(tamanho);
-        DesenharBarras(tamanho);
-    }
+	public override void _Draw()
+	{
+		if (_voo is null || _nave is null) return;
+		DrawRect(new Rect2(0, 0, Size.X, 112), new Color(0.015f, 0.025f, 0.03f, 0.62f));
+		DrawRect(new Rect2(0, Size.Y - 146, Size.X, 146), new Color(0.025f, 0.038f, 0.043f, 0.9f));
+		DrawLine(new(28, Size.Y - 94), new(Size.X - 28, Size.Y - 94), new Color(0.5f, 0.7f, 0.65f, 0.28f));
+		var valores = new[] { _nave.Energia / 100f, Mathf.Abs(_voo.VelocidadeFrontalAtual), _nave.Integridade / 100f, _progresso };
+		var largura = (Size.X - 56) / 4f;
+		for (var indice = 0; indice < 4; indice++)
+		{
+			var barra = new Rect2(28 + largura * indice, Size.Y - 21, largura - 26, 3);
+			DrawRect(barra, new Color(0.2f, 0.28f, 0.27f));
+			barra.Size = new(barra.Size.X * Mathf.Clamp(valores[indice], 0, 1), 3);
+			DrawRect(barra, indice == 1 ? _ambar : _verde);
+		}
+		var centro = Size * 0.5f;
+		var cor = new Color(0.7f, 0.9f, 0.85f, 0.55f);
+		DrawArc(centro, 10, 0, Mathf.Tau, 32, cor, 1, true);
+		DrawLine(centro + new Vector2(-23, 0), centro + new Vector2(-14, 0), cor, 1, true);
+		DrawLine(centro + new Vector2(14, 0), centro + new Vector2(23, 0), cor, 1, true);
+		DrawCircle(centro, 1.5f, cor);
+	}
 
-    private void DesenharJanela(Vector2 tamanho, float margemLateral, float topoJanela, float baseJanela)
-    {
-        var corEstrutura = new Color(0.02f, 0.025f, 0.03f, 0.94f);
-        var corBorda = new Color(0.0f, 0.75f, 0.95f, 0.38f);
+	private Label Texto(int fonte, Color cor)
+	{
+		var texto = new Label { MouseFilter = MouseFilterEnum.Ignore, AutowrapMode = TextServer.AutowrapMode.WordSmart };
+		texto.AddThemeFontSizeOverride("font_size", fonte);
+		texto.AddThemeColorOverride("font_color", cor);
+		AddChild(texto);
+		return texto;
+	}
 
-        DrawRect(new Rect2(Vector2.Zero, new Vector2(tamanho.X, topoJanela)), corEstrutura);
-        DrawRect(new Rect2(Vector2.Zero, new Vector2(margemLateral, tamanho.Y)), corEstrutura);
-        DrawRect(new Rect2(new Vector2(tamanho.X - margemLateral, 0f), new Vector2(margemLateral, tamanho.Y)), corEstrutura);
-        DrawRect(new Rect2(new Vector2(0f, baseJanela), new Vector2(tamanho.X, tamanho.Y - baseJanela)), corEstrutura);
+	private Button Botao(string texto, string dica)
+	{
+		var botao = new Button { Text = texto, TooltipText = dica, FocusMode = FocusModeEnum.None };
+		foreach (var estado in new[] { "normal", "hover", "pressed" })
+			botao.AddThemeStyleboxOverride(estado, new StyleBoxFlat
+			{
+				BgColor = estado == "normal" ? new Color("243632") : new Color("3a5850"),
+				BorderColor = new Color("567c70"), BorderWidthBottom = 1,
+				ContentMarginLeft = 12, ContentMarginRight = 12
+			});
+		botao.AddThemeFontSizeOverride("font_size", 13);
+		AddChild(botao);
+		return botao;
+	}
 
-        DrawLine(new Vector2(margemLateral, topoJanela), new Vector2(tamanho.X - margemLateral, topoJanela), corBorda, 2f);
-        DrawLine(new Vector2(margemLateral, baseJanela), new Vector2(tamanho.X - margemLateral, baseJanela), corBorda, 2f);
-        DrawLine(new Vector2(margemLateral, topoJanela), new Vector2(margemLateral, baseJanela), corBorda, 2f);
-        DrawLine(new Vector2(tamanho.X - margemLateral, topoJanela), new Vector2(tamanho.X - margemLateral, baseJanela), corBorda, 2f);
-
-        DrawLine(new Vector2(tamanho.X * 0.32f, baseJanela), new Vector2(tamanho.X * 0.45f, tamanho.Y), corEstrutura, 26f);
-        DrawLine(new Vector2(tamanho.X * 0.68f, baseJanela), new Vector2(tamanho.X * 0.55f, tamanho.Y), corEstrutura, 26f);
-    }
-
-    private void DesenharMarcadoresDeRota(Vector2 centro, Vector2 tamanho)
-    {
-        if (_controladorDeVoo is null)
-        {
-            return;
-        }
-
-        var escala = new Vector2(tamanho.X * 0.22f, tamanho.Y * 0.22f);
-        var posicaoReticulo = centro + new Vector2(_controladorDeVoo.ApontamentoDoPiloto.X * escala.X, -_controladorDeVoo.ApontamentoDoPiloto.Y * escala.Y);
-        var posicaoDestino = centro + new Vector2(_controladorDeVoo.PontoDeDobra.X * escala.X, -_controladorDeVoo.PontoDeDobra.Y * escala.Y);
-        var corReticulo = new Color(0.85f, 0.98f, 1f, 0.92f);
-        var corDestino = _controladorDeVoo.AlinhamentoDaRota > 0.76f
-            ? new Color(0.1f, 1f, 0.52f, 0.95f)
-            : new Color(1f, 0.72f, 0.18f, 0.95f);
-
-        DrawLine(posicaoReticulo + new Vector2(-20f, 0f), posicaoReticulo + new Vector2(20f, 0f), corReticulo, 2f);
-        DrawLine(posicaoReticulo + new Vector2(0f, -20f), posicaoReticulo + new Vector2(0f, 20f), corReticulo, 2f);
-        DrawCircle(posicaoReticulo, 8f, new Color(0.85f, 0.98f, 1f, 0.24f));
-
-        var raio = 19f + Mathf.Sin(_pulso * 5f) * 2f;
-        DrawCircle(posicaoDestino, raio, new Color(corDestino.R, corDestino.G, corDestino.B, 0.14f));
-        DrawCircle(posicaoDestino, 5f, corDestino);
-        DrawLine(posicaoReticulo, posicaoDestino, new Color(0.45f, 0.95f, 1f, 0.22f), 1f);
-    }
-
-    private void DesenharPainelInferior(Vector2 tamanho)
-    {
-        var y = tamanho.Y * 0.78f;
-        DrawRect(new Rect2(new Vector2(0f, y), new Vector2(tamanho.X, tamanho.Y - y)), new Color(0.015f, 0.018f, 0.02f, 0.98f));
-        DrawRect(new Rect2(new Vector2(tamanho.X * 0.12f, y + 16f), new Vector2(tamanho.X * 0.76f, 4f)), new Color(0f, 0.8f, 0.95f, 0.45f));
-        DrawRect(new Rect2(new Vector2(tamanho.X * 0.38f, y + 44f), new Vector2(tamanho.X * 0.24f, 84f)), new Color(0.05f, 0.08f, 0.09f, 0.96f));
-        DrawRect(new Rect2(new Vector2(tamanho.X * 0.08f, y + 54f), new Vector2(tamanho.X * 0.22f, 96f)), new Color(0.04f, 0.05f, 0.055f, 0.96f));
-        DrawRect(new Rect2(new Vector2(tamanho.X * 0.70f, y + 54f), new Vector2(tamanho.X * 0.22f, 96f)), new Color(0.04f, 0.05f, 0.055f, 0.96f));
-    }
-
-    private void DesenharBarras(Vector2 tamanho)
-    {
-        if (_controladorDeVoo is null || _estadoDaNave is null)
-        {
-            return;
-        }
-
-        var y = tamanho.Y * 0.835f;
-        DesenharBarra(new Vector2(tamanho.X * 0.1f, y), new Vector2(tamanho.X * 0.16f, 18f), _estadoDaNave.Energia / 100f, new Color(0.15f, 0.75f, 1f, 0.95f));
-        DesenharBarra(new Vector2(tamanho.X * 0.31f, y), new Vector2(tamanho.X * 0.16f, 18f), _controladorDeVoo.VelocidadeFrontalAtual, new Color(0.95f, 0.95f, 0.35f, 0.95f));
-        DesenharBarra(new Vector2(tamanho.X * 0.52f, y), new Vector2(tamanho.X * 0.16f, 18f), _controladorDeVoo.AlinhamentoDaRota, new Color(0.95f, 0.65f, 0.25f, 0.95f));
-        DesenharBarra(new Vector2(tamanho.X * 0.73f, y), new Vector2(tamanho.X * 0.16f, 18f), _estadoDaNave.CargaDeDobra / 100f, new Color(0.2f, 1f, 0.55f, 0.95f));
-
-        if (_controladorDoLoopCentral is not null)
-        {
-            DesenharBarra(new Vector2(tamanho.X * 0.52f, y + 30f), new Vector2(tamanho.X * 0.16f, 14f), _controladorDoLoopCentral.ProgressoDoWaypoint / 100f, new Color(0.95f, 0.45f, 0.25f, 0.95f));
-        }
-        else
-        {
-            DesenharBarra(new Vector2(tamanho.X * 0.52f, y + 30f), new Vector2(tamanho.X * 0.16f, 14f), _progressoNaRota, new Color(0.95f, 0.45f, 0.25f, 0.95f));
-        }
-    }
-
-    private void DesenharBarra(Vector2 posicao, Vector2 tamanho, float proporcao, Color cor)
-    {
-        var valor = Mathf.Clamp(proporcao, 0f, 1f);
-        DrawRect(new Rect2(posicao, tamanho), new Color(0.0f, 0.0f, 0.0f, 0.7f));
-        DrawRect(new Rect2(posicao + new Vector2(2f, 2f), new Vector2((tamanho.X - 4f) * valor, tamanho.Y - 4f)), cor);
-        DrawRect(new Rect2(posicao, tamanho), new Color(0.8f, 0.95f, 1f, 0.35f), false, 1f);
-    }
-
-    private Label CriarLabel(Vector2 posicao, Vector2 tamanho, int tamanhoFonte)
-    {
-        var label = new Label
-        {
-            Position = posicao,
-            Size = tamanho,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        label.AddThemeFontSizeOverride("font_size", tamanhoFonte);
-        AddChild(label);
-        return label;
-    }
-
-    private void AtualizarTextos()
-    {
-        if (_estadoDaNave is null)
-        {
-            return;
-        }
-
-        if (_textoObjetivo is not null)
-        {
-            _textoObjetivo.Text = _controladorDoLoopCentral?.ObjetivoAtual ?? _objetivoAtual;
-        }
-
-        if (_textoOrion is not null)
-        {
-            _textoOrion.Text = _diretorNarrativo?.UltimaLinha ?? "ORION: Sistemas em modo de teste.";
-        }
-
-        if (_textoStatus is not null)
-        {
-            var progresso = _controladorDoLoopCentral?.ProgressoDoWaypoint ?? 0f;
-            var waypoint = _controladorDoLoopCentral?.NumeroDoWaypoint ?? 1;
-            _textoStatus.Text =
-                (_controladorDoLoopCentral is not null
-                    ? $"WP {waypoint}  Aproximacao {progresso:0}%\n"
-                    : $"Rota {_progressoNaRota * 100f:0}%  Camera {_controladorDeVoo?.RotacaoCameraGraus.X:0},{_controladorDeVoo?.RotacaoCameraGraus.Y:0}\n") +
-                $"Vel {_controladorDeVoo?.VelocidadeFrontalAtual * 100f:0}%  Dobra {_estadoDaNave.CargaDeDobra:0}%";
-        }
-    }
-
-    private void AoEventoPublicado(EventoDeDominio eventoDeDominio)
-    {
-        switch (eventoDeDominio)
-        {
-            case ObjetivoAlterado evento:
-                _objetivoAtual = evento.TextoDoObjetivo;
-                break;
-            case ProgressoNaRotaAlterado evento:
-                _progressoNaRota = evento.ProgressoAtual;
-                break;
-            case SegmentoDeViagemReiniciado:
-                _progressoNaRota = 0f;
-                _objetivoAtual = "Avance pela rota de teste.";
-                break;
-        }
-    }
+	private void AoEvento(EventoDeDominio evento)
+	{
+		switch (evento)
+		{
+			case ObjetivoAlterado objetivo: _textoObjetivo = objetivo.TextoDoObjetivo; break;
+			case ProgressoNaRotaAlterado progresso: _progresso = progresso.ProgressoAtual; break;
+			case SegmentoDeViagemConcluido: _concluido = true; _progresso = 1f; break;
+			case SegmentoDeViagemReiniciado: _concluido = false; _progresso = 0f; break;
+		}
+	}
 }

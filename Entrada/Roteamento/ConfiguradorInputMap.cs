@@ -24,6 +24,11 @@ public static class ConfiguradorInputMap
         GarantirAcaoDeTeclas("piloto_acao_primaria", Key.Space);
         GarantirAcaoDeTeclas("piloto_confirmar", Key.Enter);
         GarantirAcaoDeTeclas("piloto_cancelar", Key.Escape);
+        GarantirAcaoDeTeclas("camera_recentralizar", Key.R);
+        GarantirAcaoDeTeclas("alternar_debug", Key.F3);
+        GarantirAcaoDeTeclas("alternar_estacao", Key.Tab);
+        GarantirAcaoDeTeclas("destino_marte", Key.Key1);
+        GarantirAcaoDeTeclas("destino_jupiter", Key.Key2);
     }
 
     private static void GarantirAcaoDeTeclas(string nomeDaAcao, params Key[] teclas)

@@ -1,0 +1,81 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Robusto/Cenarios/CenarioDaViagem.cs" id="1"]
+[ext_resource type="PackedScene" path="res://Apresentacao/Cenarios/AmbienteDestino.tscn" id="2"]
+[ext_resource type="Shader" path="res://Robusto/Projecao/SuperficieEstelar.gdshader" id="3"]
+[ext_resource type="Shader" path="res://Robusto/Projecao/HaloEstelar.gdshader" id="4"]
+[ext_resource type="Script" path="res://Robusto/Cenarios/AparenciaAnaBranca.cs" id="5"]
+
+
+
+
+[sub_resource type="ShaderMaterial" id="MaterialPlaneta"]
+shader = ExtResource("3")
+
+[sub_resource type="SphereMesh" id="Esfera"]
+radius = 60.0
+height = 120.0
+radial_segments = 96
+rings = 48
+material = SubResource("MaterialPlaneta")
+
+[sub_resource type="ShaderMaterial" id="MaterialHalo"]
+shader = ExtResource("4")
+
+[sub_resource type="SphereMesh" id="EsferaHalo"]
+radius = 72.0
+height = 144.0
+radial_segments = 96
+rings = 48
+material = SubResource("MaterialHalo")
+
+[sub_resource type="Curve3D" id="Curva"]
+bake_interval = 0.2
+_data = {
+"points": PackedVector3Array(0, 0, 8, 0, 0, -8, 0, 0, 0, -1, 0, 12, 1, 0, -12, 2, 0.5, -35, 1, 0, 12, -1, 0, -12, -1, 1, -75, 0, 0, 8, 0, 0, -8, 0, 1, -120),
+"tilts": PackedFloat32Array(0, 0, 0, 0)
+}
+point_count = 4
+
+
+[node name="AnaBranca" type="Node3D"]
+script = ExtResource("1")
+Identificador = "ana_branca"
+NomeExibicao = "AnaBranca"
+RotacaoDoPlaneta = 0.003
+
+[node name="Mundo" type="Node3D" parent="."]
+[node name="CorposCelestes" type="Node3D" parent="Mundo"]
+[node name="Planeta" type="Node3D" parent="Mundo/CorposCelestes"]
+position = Vector3(25, 155, -330)
+script = ExtResource("5")
+
+[node name="Halo" type="MeshInstance3D" parent="Mundo/CorposCelestes/Planeta"]
+mesh = SubResource("EsferaHalo")
+cast_shadow = 0
+
+[node name="LuzEstelar" type="OmniLight3D" parent="Mundo/CorposCelestes/Planeta"]
+light_color = Color(0.67, 0.81, 1, 1)
+light_energy = 1.8
+omni_range = 800.0
+omni_attenuation = 0.6
+
+[node name="Superficie" type="MeshInstance3D" parent="Mundo/CorposCelestes/Planeta"]
+rotation_degrees = Vector3(0, 30, 0)
+mesh = SubResource("Esfera")
+[node name="Geometria" type="Node3D" parent="Mundo"]
+[node name="Objetos" type="Node3D" parent="Mundo"]
+[node name="EfeitosVisuais" type="Node3D" parent="Mundo"]
+[node name="Jogabilidade" type="Node3D" parent="."]
+[node name="Eventos" type="Node3D" parent="Jogabilidade"]
+[node name="Gatilhos" type="Node3D" parent="Jogabilidade"]
+[node name="PontosDeAparecimento" type="Node3D" parent="Jogabilidade"]
+[node name="Iluminacao" type="Node3D" parent="."]
+[node name="AmbienteDestino" parent="Iluminacao" instance=ExtResource("2")]
+[node name="Audio" type="Node3D" parent="."]
+[node name="AlvosDeCamera" type="Node3D" parent="."]
+[node name="CentroDoPlaneta" type="Marker3D" parent="Mundo/CorposCelestes/Planeta"]
+[node name="Debug" type="Node3D" parent="."]
+visible = false
+[node name="Rota" type="Path3D" parent="."]
+curve = SubResource("Curva")

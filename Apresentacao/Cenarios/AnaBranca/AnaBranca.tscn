@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Apresentacao/Cenarios/CenarioBase.cs" id="1"]
+
+[node name="AnaBranca" type="Node3D"]
+script = ExtResource("1")
+Identificador = "ana_branca"
+NomeExibicao = "Ana Branca"
+IndiceDeEtapa = 3
+ProximosCenarios = PackedStringArray()
+
+[node name="Mundo" type="Node3D" parent="."]
+
+[node name="CorposCelestes" type="Node3D" parent="Mundo"]
+
+[node name="Geometria" type="Node3D" parent="Mundo"]
+
+[node name="Objetos" type="Node3D" parent="Mundo"]
+
+[node name="EfeitosVisuais" type="Node3D" parent="Mundo"]
+
+[node name="Jogabilidade" type="Node3D" parent="."]
+
+[node name="Eventos" type="Node3D" parent="Jogabilidade"]
+
+[node name="Gatilhos" type="Node3D" parent="Jogabilidade"]
+
+[node name="PontosDeAparecimento" type="Node3D" parent="Jogabilidade"]
+
+[node name="Iluminacao" type="Node3D" parent="."]
+
+[node name="Audio" type="Node3D" parent="."]
+
+[node name="AlvosDeCamera" type="Node3D" parent="."]
+
+[node name="Debug" type="Node3D" parent="."]
+visible = false

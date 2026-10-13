@@ -8,5 +8,6 @@
   <ItemGroup>
     <Compile Remove=".godot\**\*.cs" />
     <Compile Remove="Testes\**\*.cs" />
+    <Compile Include="Testes\Integracao\*.cs" />
   </ItemGroup>
 </Project>

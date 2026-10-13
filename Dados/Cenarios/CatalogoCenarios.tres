@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CatalogoCenarios" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Dados/Cenarios/CatalogoCenarios.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Caminhos = Dictionary[String, String]({
+"terra_saida": "res://Apresentacao/Cenarios/TerraSaida/TerraSaida.tscn",
+"marte": "res://Apresentacao/Cenarios/Marte/Marte.tscn",
+"jupiter": "res://Apresentacao/Cenarios/Jupiter/Jupiter.tscn",
+"saturno": "res://Apresentacao/Cenarios/Saturno/Saturno.tscn",
+"urano": "res://Apresentacao/Cenarios/Urano/Urano.tscn",
+"ana_branca": "res://Apresentacao/Cenarios/AnaBranca/AnaBranca.tscn",
+"buraco_negro": "res://Apresentacao/Cenarios/BuracoNegro/BuracoNegro.tscn",
+"prototipo": "res://Apresentacao/Cenarios/Prototipo/Prototipo.tscn"
+})

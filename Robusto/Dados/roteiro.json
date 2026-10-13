@@ -1,0 +1,15 @@
+[
+  { "Id":"terra", "Cenario":"terra", "Titulo":"TERRA / PARTIDA", "Texto":"ORION: Bem-vindos a bordo. Iniciando nossa viagem.", "Duracao":16, "Velocidade":0.8 },
+  { "Id":"salto_marte", "Cenario":"marte", "Tipo":"salto", "Titulo":"DESTINO / MARTE", "Texto":"ORION: Preparando o salto para Marte.", "Duracao":6, "Velocidade":0 },
+  { "Id":"marte", "Cenario":"marte", "Titulo":"MARTE", "Texto":"ORION: Observem o relevo e as cores do planeta vermelho.", "Duracao":14, "Velocidade":0.65 },
+  { "Id":"piratas", "Cenario":"marte", "Tipo":"combate", "Titulo":"CONTATOS NA ROTA", "Texto":"ORION: Contatos hostis. Defesa autorizada.", "Duracao":1, "Velocidade":0.35 },
+  { "Id":"pos_marte", "Cenario":"marte", "Titulo":"ROTA LIBERADA", "Texto":"ORION: Seguimos para Urano.", "Duracao":5, "Velocidade":0.8 },
+  { "Id":"salto_urano", "Cenario":"urano", "Tipo":"salto", "Titulo":"DESTINO / URANO", "Texto":"ORION: Salto iniciado.", "Duracao":6, "Velocidade":0 },
+  { "Id":"urano", "Cenario":"urano", "Titulo":"URANO", "Texto":"ORION: Um gigante gelado e seus aneis discretos.", "Duracao":12, "Velocidade":0.6 },
+  { "Id":"gelo", "Cenario":"urano", "Tipo":"gelo", "Titulo":"OBJETO NA ROTA", "Texto":"ORION: Corpo gelado em aproximacao.", "Duracao":1, "Velocidade":0.35 },
+  { "Id":"pos_urano", "Cenario":"urano", "Titulo":"TRAVESSIA SEGURA", "Texto":"ORION: Preparando a travessia interestelar.", "Duracao":5, "Velocidade":0.7 },
+  { "Id":"salto_ana", "Cenario":"ana_branca", "Tipo":"salto", "Titulo":"SALTO INTERESTELAR", "Texto":"ORION: A viagem continua alem do Sistema Solar.", "Duracao":6, "Velocidade":0 },
+  { "Id":"ana_branca", "Cenario":"ana_branca", "Titulo":"ANA BRANCA", "Texto":"", "Duracao":22, "Velocidade":0.25 },
+  { "Id":"salto_final", "Cenario":"chegada", "Tipo":"salto", "Titulo":"ULTIMO SALTO", "Texto":"ORION: Aproximando do destino final.", "Duracao":6, "Velocidade":0 },
+  { "Id":"chegada", "Cenario":"chegada", "Tipo":"chegada", "Titulo":"DESTINO ALCANCADO", "Texto":"ORION: Viagem concluida. Obrigado por embarcar.", "Duracao":1, "Velocidade":0 }
+]

@@ -1,0 +1,43 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://Robusto/Viagem/DiretorDaViagem.cs" id="1"]
+[ext_resource type="Script" path="res://Robusto/Viagem/PilotoAutomatico.cs" id="2"]
+[ext_resource type="Script" path="res://Apresentacao/Cenas/InteriorDaNave.cs" id="3"]
+[ext_resource type="Script" path="res://Apresentacao/Cenarios/GerenciadorCenarios.cs" id="4"]
+[ext_resource type="Resource" path="res://Robusto/Dados/Catalogo.tres" id="5"]
+[ext_resource type="Script" path="res://Robusto/Eventos/CombateDeMarte.cs" id="6"]
+[ext_resource type="Script" path="res://Robusto/Eventos/EventoDoGelo.cs" id="7"]
+[ext_resource type="Script" path="res://Robusto/Viagem/AudioDaViagem.cs" id="8"]
+[ext_resource type="Resource" path="res://Robusto/Dados/Exibicao.tres" id="9"]
+[ext_resource type="Script" path="res://Robusto/Viagem/ControladorDoOlhar.cs" id="10"]
+
+[node name="Experiencia" type="Node3D"]
+script = ExtResource("1")
+ConfiguracaoExibicao = ExtResource("9")
+
+[node name="SistemasPersistentes" type="Node" parent="."]
+[node name="GerenciadorCenarios" type="Node" parent="SistemasPersistentes" node_paths=PackedStringArray("Recipiente")]
+script = ExtResource("4")
+Recipiente = NodePath("../../RecipienteCenarios")
+Catalogo = ExtResource("5")
+[node name="AudioDaViagem" type="Node" parent="SistemasPersistentes"]
+script = ExtResource("8")
+[node name="EventoDoGelo" type="Node" parent="SistemasPersistentes"]
+script = ExtResource("7")
+
+[node name="Nave" type="Node3D" parent="."]
+script = ExtResource("2")
+[node name="InteriorDaNave" type="Node3D" parent="Nave"]
+script = ExtResource("3")
+CabineCompacta = true
+[node name="CameraRig" type="Node3D" parent="Nave"]
+position = Vector3(0, 0.12, 0.1)
+script = ExtResource("10")
+[node name="CameraPiloto" type="Camera3D" parent="Nave/CameraRig"]
+current = true
+near = 0.05
+far = 3000.0
+fov = 75.0
+
+[node name="CombateDeMarte" type="Node3D" parent="."]
+script = ExtResource("6")
+[node name="RecipienteCenarios" type="Node3D" parent="."]
